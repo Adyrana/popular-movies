@@ -20,6 +20,10 @@ import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import com.example.android.popularmovies.data.Movie;
+
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -28,7 +32,20 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_movielist);
     }
 
-    public class FetchMoviesTask extends AsyncTask<String, Void, List<Movies>> {
+    public class FetchMoviesTask extends AsyncTask<String, Void, List<Movie>> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
 
+        @Override
+        protected List<Movie> doInBackground(String... strings) {
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(List<Movie> movies) {
+            super.onPostExecute(movies);
+        }
     }
 }
