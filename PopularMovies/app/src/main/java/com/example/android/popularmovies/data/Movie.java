@@ -16,9 +16,60 @@
 
 package com.example.android.popularmovies.data;
 
+import com.google.gson.annotations.SerializedName;
+
+import java.io.Serializable;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
 /**
  * Created by Julia on 2017-01-19.
  */
 
-public class Movie {
+@AllArgsConstructor
+@Data
+public class Movie implements Serializable {
+
+    @SerializedName("poster_path")
+    private String posterPath;
+
+    @SerializedName("adult")
+    private Boolean adult;
+
+    @SerializedName("overview")
+    private String overview;
+
+    @SerializedName("release_date")
+    private String releaseDate;
+
+    @SerializedName("genre_ids")
+    private Integer[] genreIds;
+
+    @SerializedName("id")
+    private Integer id;
+
+    @SerializedName("original_title")
+    private String originalTitle;
+
+    @SerializedName("original_language")
+    private String originalLanguage;
+
+    @SerializedName("title")
+    private String title;
+
+    @SerializedName("backdrop_path")
+    private String backdropPath;
+
+    @SerializedName("popularity")
+    private Double popularity;
+
+    @SerializedName("vote_count")
+    private Integer voteCount;
+
+    @SerializedName("video")
+    private Boolean video;
+
+    @SerializedName("vote_average")
+    private Double voteAverage;
 }
