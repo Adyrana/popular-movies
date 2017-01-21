@@ -21,7 +21,7 @@ import com.google.gson.Gson;
 /**
  * Created by Julia on 2017-01-19.
  */
-public class JSONUtility {
+public class JsonUtility {
 
     private static final Gson gson = new Gson();
 
