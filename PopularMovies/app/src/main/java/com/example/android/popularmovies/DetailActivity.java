@@ -98,6 +98,11 @@ public class DetailActivity extends AppCompatActivity {
         }
     }
 
+    private void setBothInvisible() {
+        mDetailedMovieLinearLayout.setVisibility(View.INVISIBLE);
+        mErrorMessageDisplay.setVisibility(View.INVISIBLE);
+    }
+
     private void showMovieDetailedDataView() {
         mDetailedMovieLinearLayout.setVisibility(View.VISIBLE);
         mErrorMessageDisplay.setVisibility(View.INVISIBLE);
@@ -112,6 +117,7 @@ public class DetailActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            setBothInvisible();
             mLoadingIndicator.setVisibility(View.VISIBLE);
         }
 
