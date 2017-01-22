@@ -122,7 +122,7 @@ public class NetworkUtils {
      */
     public static String buildPosterUrl(String posterPath) {
         String url = THE_MOVIE_DB_POSTER_URL + W342 + SEPARATOR + posterPath;
-        Log.v(TAG, "buildPosterUrl: " + url);
+        Log.d(TAG, "buildPosterUrl: " + url);
         return url;
     }
 
@@ -134,6 +134,7 @@ public class NetworkUtils {
      * @throws IOException Related to network and stream reading
      */
     public static String getResponseFromHttpUrl(URL url) throws IOException {
+        Log.v(TAG, "opening connection to: " + url.toString());
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         try {
             InputStream in = urlConnection.getInputStream();

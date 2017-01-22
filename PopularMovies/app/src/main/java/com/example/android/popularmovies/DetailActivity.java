@@ -175,6 +175,8 @@ public class DetailActivity extends AppCompatActivity {
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         Log.d(TAG, "onSaveInstanceState mMovie: " + JsonUtility.toJson(mMovie));
-        outState.putParcelable(LIFECYCLE_CALLBACKS_TEXT_KEY, mMovie);
+        if(mMovie != null) {
+            outState.putParcelable(LIFECYCLE_CALLBACKS_TEXT_KEY, mMovie);
+        }
     }
 }

@@ -193,6 +193,8 @@ public class MainActivity extends AppCompatActivity implements TheMovieDbAdapter
         super.onSaveInstanceState(outState);
         ArrayList<Movie> movies = (ArrayList<Movie>) mTheMovieDbAdapter.getMMovies();
         Log.d(TAG, "onSaveInstanceState movies: " + JsonUtility.toJson(movies));
-        outState.putParcelableArrayList(LIFECYCLE_CALLBACKS_TEXT_KEY, movies);
+        if(movies != null) {
+            outState.putParcelableArrayList(LIFECYCLE_CALLBACKS_TEXT_KEY, movies);
+        }
     }
 }
