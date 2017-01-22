@@ -22,7 +22,12 @@ import android.util.Log;
 
 import com.example.android.popularmovies.R;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 
 /**
  * Utility class for reading the file with the api-key
@@ -39,13 +44,17 @@ public class ApiKeyUtility {
      * @return A string containing what is written to the file
      */
     public static String readApiKey(Resources res) {
+        InputStream is = res.openRawResource(R.raw.the_movie_db);
+        BufferedReader br = null;
         try {
-            InputStream in_s = res.openRawResource(R.raw.the_movie_db);
-
-            byte[] b = new byte[in_s.available()];
-            in_s.read(b);
-            return new String(b);
-        } catch (Exception e) {
+            br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+            String apiKey = br.readLine();
+            Log.d(TAG, "apiKey: " + apiKey);
+            return apiKey;
+        } catch (UnsupportedEncodingException e) {
+            Log.e(TAG, "Unable to read API file the_movie_db.txt", e);
+            return "";
+        } catch (IOException e) {
             Log.e(TAG, "Unable to read API file the_movie_db.txt", e);
             return "";
         }
