@@ -27,17 +27,16 @@ import java.net.URL;
 import java.util.Scanner;
 
 /**
- * Created by Julia on 2017-01-21.
+ * Network utility class for building urls and making requests.
+ *
+ * @author Julia Mattjus
  */
-
 public class NetworkUtils {
     public enum Sorting {
         POPULAR, TOP_RATED
     }
 
     private static final String TAG = NetworkUtils.class.getSimpleName();
-
-    //private static final String THE_MOVIE_DB_URL = "http://image.tmdb.org/t/p/";
 
     private static final String THE_MOVIE_DB_URL = "http://api.themoviedb.org/3/movie/";
     private static final String THE_MOVIE_DB_POSTER_URL = "http://image.tmdb.org/t/p/";
@@ -54,6 +53,13 @@ public class NetworkUtils {
 
     private static final String format = "json";
 
+    /**
+     * Build an URL for requests for popular or top rated movies
+     *
+     * @param sorting The sorting to use
+     * @param apiKey Api-key towards The Movie DB
+     * @return The URL to use to query The Movie DB
+     */
     public static URL buildUrl(Sorting sorting, String apiKey) {
         Uri builtUri = Uri.parse(THE_MOVIE_DB_URL).buildUpon()
                 .appendPath(getSorting(sorting))
@@ -67,7 +73,32 @@ public class NetworkUtils {
             Log.e(TAG, e.getMessage(), e);
         }
 
-        Log.v(TAG, "build URI: " + url);
+        Log.v(TAG, "buildUrl - build URI: " + url);
+
+        return url;
+    }
+
+    /**
+     * Buid an URL for requesting data for a specific movie by its id.
+     *
+     * @param movieId Id of the movie to request data for
+     * @param apiKey Api-key towards The Movie DB
+     * @return The URL to use to query The Movie DB
+     */
+    public static URL buildMovieURL(Integer movieId, String apiKey) {
+        Uri builtUri = Uri.parse(THE_MOVIE_DB_URL).buildUpon()
+                .appendPath(movieId.toString())
+                .appendQueryParameter(API_KEY, apiKey)
+                .build();
+
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            Log.e(TAG, e.getMessage(), e);
+        }
+
+        Log.v(TAG, "buildMovieURL - build URI: " + url);
 
         return url;
     }
@@ -83,10 +114,25 @@ public class NetworkUtils {
         }
     }
 
+    /**
+     * Build an URL as a String to request posters from The Movie DB with
+     *
+     * @param posterPath Path to the poster
+     * @return The URL as a String to use to get The Movie DB posters with
+     */
     public static String buildPosterUrl(String posterPath) {
-        return THE_MOVIE_DB_POSTER_URL + W342 + SEPARATOR + posterPath;
+        String url = THE_MOVIE_DB_POSTER_URL + W342 + SEPARATOR + posterPath;
+        Log.v(TAG, "buildPosterUrl: " + url);
+        return url;
     }
 
+    /**
+     * This method returns the entire result from the HTTP response.
+     *
+     * @param url The URL to fetch the HTTP response from.
+     * @return The contents of the HTTP response.
+     * @throws IOException Related to network and stream reading
+     */
     public static String getResponseFromHttpUrl(URL url) throws IOException {
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
         try {

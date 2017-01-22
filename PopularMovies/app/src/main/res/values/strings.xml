@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">Popular Movies</string>
+    <string name="error">An error occurred. Please try again...</string>
+    <string name="action_most_popular">Most Popular</string>
+    <string name="action_top_rated">Top Rated</string>
+    <string name="detail_title">Title - should be replaced</string>
+    <string name="detail_release_date">Release date - should be replaced</string>
+    <string name="detail_runtime">Runtime - should be replaced</string>
+    <string name="detail_rating">Rating - should be replaced</string>
+    <string name="detail_synopsis">Synopsis - should be replaced</string>
+    <string name="detail_minutes">min</string>
+    <string name="detail_of_ten">/10</string>
 </resources>

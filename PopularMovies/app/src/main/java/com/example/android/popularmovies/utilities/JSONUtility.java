@@ -19,7 +19,9 @@ package com.example.android.popularmovies.utilities;
 import com.google.gson.Gson;
 
 /**
- * Created by Julia on 2017-01-19.
+ * Utility class for converting to and from JSON
+ *
+ * @author Julia Mattjus
  */
 public class JsonUtility {
 
