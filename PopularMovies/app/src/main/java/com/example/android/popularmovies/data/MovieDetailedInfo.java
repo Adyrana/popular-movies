@@ -40,10 +40,10 @@ import lombok.Data;
  *
  * uses Lombok, there needs to be an lombok.config file in the project root with these options
  * to make things work properly:
- * <li>
- *     <ul>lombok.addGeneratedAnnotation = false</ul>
- *     <ul>lombok.anyConstructor.suppressConstructorProperties = true</ul>
- * </li>
+ * <ul>
+ *     <li>lombok.addGeneratedAnnotation = false</li>
+ *     <li>lombok.anyConstructor.suppressConstructorProperties = true</li>
+ * </ul>
  *
  * @author Julia Mattjus
  */
