@@ -196,7 +196,7 @@ public class MainActivity extends AppCompatActivity implements TheMovieDbAdapter
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        ArrayList<Movie> movies = (ArrayList<Movie>) mTheMovieDbAdapter.getMMovies();
+        ArrayList<Movie> movies = (ArrayList<Movie>) mTheMovieDbAdapter.getMovies();
         Log.d(TAG, "onSaveInstanceState movies: " + JsonUtility.toJson(movies));
         if(movies != null) {
             outState.putParcelableArrayList(LIFECYCLE_CALLBACKS_TEXT_KEY, movies);

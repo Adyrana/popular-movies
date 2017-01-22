@@ -30,8 +30,6 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-import lombok.Getter;
-
 /**
  * {@link TheMovieDbAdapter} exposes a list of movies to a
  * {@link android.support.v7.widget.RecyclerView}
@@ -42,7 +40,7 @@ public class TheMovieDbAdapter extends RecyclerView.Adapter<TheMovieDbAdapter.Th
 
     private static final String TAG = TheMovieDbAdapter.class.getSimpleName();
 
-    private @Getter List<Movie> mMovies;
+    private List<Movie> mMovies;
 
     private final TheMovieDbAdapterOnClickHandler mClickHandler;
 
@@ -112,6 +110,10 @@ public class TheMovieDbAdapter extends RecyclerView.Adapter<TheMovieDbAdapter.Th
     public int getItemCount() {
         if (null == mMovies) return 0;
         return mMovies.size();
+    }
+
+    public List<Movie> getMovies() {
+        return mMovies;
     }
 
     /**
