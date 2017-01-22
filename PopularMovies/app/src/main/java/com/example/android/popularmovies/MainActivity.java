@@ -203,7 +203,7 @@ public class MainActivity extends AppCompatActivity implements TheMovieDbAdapter
         }
     }
 
-    public boolean isOnline() {
+    private boolean isOnline() {
         ConnectivityManager cm =
                 (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
