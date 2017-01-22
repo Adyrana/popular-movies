@@ -18,8 +18,9 @@ package com.example.android.popularmovies;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
-import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
@@ -92,7 +93,11 @@ public class MainActivity extends AppCompatActivity implements TheMovieDbAdapter
     private void loadMovieData(NetworkUtils.Sorting sorting) {
         showMovieDataView();
 
-        new FetchMoviesTask().execute(sorting);
+        if(isOnline()) {
+            new FetchMoviesTask().execute(sorting);
+        } else {
+            showErrorMessage();
+        }
     }
 
     /**
@@ -196,5 +201,12 @@ public class MainActivity extends AppCompatActivity implements TheMovieDbAdapter
         if(movies != null) {
             outState.putParcelableArrayList(LIFECYCLE_CALLBACKS_TEXT_KEY, movies);
         }
+    }
+
+    public boolean isOnline() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 }

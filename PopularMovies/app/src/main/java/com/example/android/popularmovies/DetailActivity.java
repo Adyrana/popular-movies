@@ -16,7 +16,10 @@
 
 package com.example.android.popularmovies;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -27,7 +30,6 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.example.android.popularmovies.data.Movie;
 import com.example.android.popularmovies.data.MovieDetailedInfo;
 import com.example.android.popularmovies.utilities.ApiKeyUtility;
 import com.example.android.popularmovies.utilities.JsonUtility;
@@ -35,7 +37,6 @@ import com.example.android.popularmovies.utilities.NetworkUtils;
 import com.squareup.picasso.Picasso;
 
 import java.net.URL;
-import java.util.ArrayList;
 
 /**
  * Detailed activity for movies
@@ -88,7 +89,11 @@ public class DetailActivity extends AppCompatActivity {
             if (intentThatStartedThisActivity != null) {
                 Integer movieId = intentThatStartedThisActivity.getIntExtra(Intent.EXTRA_UID, 0);
 
-                new FetchMovieTask().execute(movieId);
+                if(isOnline()) {
+                    new FetchMovieTask().execute(movieId);
+                } else {
+                    showErrorMessage();
+                }
             }
         }
     }
@@ -178,5 +183,12 @@ public class DetailActivity extends AppCompatActivity {
         if(mMovie != null) {
             outState.putParcelable(LIFECYCLE_CALLBACKS_TEXT_KEY, mMovie);
         }
+    }
+
+    public boolean isOnline() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
     }
 }
