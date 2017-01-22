@@ -16,20 +16,29 @@
 
 package com.example.android.popularmovies.data;
 
-import com.google.gson.annotations.SerializedName;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-import java.io.Serializable;
+import com.google.gson.annotations.SerializedName;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
- * Created by Julia on 2017-01-19.
+ * Data class for a movie.
+ *
+ * uses Lombok, there needs to be an lombok.config file in the project root with these options
+ * to make things work properly:
+ * <li>
+ *     <ul>lombok.addGeneratedAnnotation = false</ul>
+ *     <ul>lombok.anyConstructor.suppressConstructorProperties = true</ul>
+ * </li>
+ *
+ * @author Julia Mattjus
  */
-
 @AllArgsConstructor
 @Data
-public class Movie implements Serializable {
+public class Movie implements Parcelable {
 
     @SerializedName("poster_path")
     private String posterPath;
@@ -72,4 +81,56 @@ public class Movie implements Serializable {
 
     @SerializedName("vote_average")
     private Double voteAverage;
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.posterPath);
+        dest.writeValue(this.adult);
+        dest.writeString(this.overview);
+        dest.writeString(this.releaseDate);
+        dest.writeArray(this.genreIds);
+        dest.writeValue(this.id);
+        dest.writeString(this.originalTitle);
+        dest.writeString(this.originalLanguage);
+        dest.writeString(this.title);
+        dest.writeString(this.backdropPath);
+        dest.writeValue(this.popularity);
+        dest.writeValue(this.voteCount);
+        dest.writeValue(this.video);
+        dest.writeValue(this.voteAverage);
+    }
+
+    protected Movie(Parcel in) {
+        this.posterPath = in.readString();
+        this.adult = (Boolean) in.readValue(Boolean.class.getClassLoader());
+        this.overview = in.readString();
+        this.releaseDate = in.readString();
+        this.genreIds = (Integer[]) in.readArray(Integer[].class.getClassLoader());
+        this.id = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.originalTitle = in.readString();
+        this.originalLanguage = in.readString();
+        this.title = in.readString();
+        this.backdropPath = in.readString();
+        this.popularity = (Double) in.readValue(Double.class.getClassLoader());
+        this.voteCount = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.video = (Boolean) in.readValue(Boolean.class.getClassLoader());
+        this.voteAverage = (Double) in.readValue(Double.class.getClassLoader());
+    }
+
+    public static final Parcelable.Creator<Movie> CREATOR = new Parcelable.Creator<Movie>() {
+        @Override
+        public Movie createFromParcel(Parcel source) {
+            return new Movie(source);
+        }
+
+        @Override
+        public Movie[] newArray(int size) {
+            return new Movie[size];
+        }
+    };
 }

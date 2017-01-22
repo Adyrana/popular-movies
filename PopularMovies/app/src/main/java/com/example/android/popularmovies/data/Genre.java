@@ -16,15 +16,16 @@
 
 package com.example.android.popularmovies.data;
 
-import com.google.gson.annotations.SerializedName;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-import java.util.List;
+import com.google.gson.annotations.SerializedName;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
- * Data class for a respons from The Movie Db.
+ * Data class for a genre.
  *
  * uses Lombok, there needs to be an lombok.config file in the project root with these options
  * to make things work properly:
@@ -37,16 +38,38 @@ import lombok.Data;
  */
 @AllArgsConstructor
 @Data
-public class TheMovieDbResponse {
-    @SerializedName("page")
-    private Integer page;
+public class Genre implements Parcelable {
+    @SerializedName("id")
+    private Integer id;
 
-    @SerializedName("results")
-    private List<Movie> results;
+    @SerializedName("name")
+    private String name;
 
-    @SerializedName("total_results")
-    private Integer totalResults;
+    @Override
+    public int describeContents() {
+        return 0;
+    }
 
-    @SerializedName("total_pages")
-    private Integer totalPages;
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeValue(this.id);
+        dest.writeString(this.name);
+    }
+
+    protected Genre(Parcel in) {
+        this.id = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.name = in.readString();
+    }
+
+    public static final Parcelable.Creator<Genre> CREATOR = new Parcelable.Creator<Genre>() {
+        @Override
+        public Genre createFromParcel(Parcel source) {
+            return new Genre(source);
+        }
+
+        @Override
+        public Genre[] newArray(int size) {
+            return new Genre[size];
+        }
+    };
 }

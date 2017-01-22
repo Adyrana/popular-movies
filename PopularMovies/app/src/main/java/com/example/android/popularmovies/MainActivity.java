@@ -18,35 +18,39 @@ package com.example.android.popularmovies;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.os.AsyncTask;
+import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.android.popularmovies.data.Movie;
 import com.example.android.popularmovies.data.TheMovieDbResponse;
+import com.example.android.popularmovies.utilities.ApiKeyUtility;
 import com.example.android.popularmovies.utilities.JsonUtility;
 import com.example.android.popularmovies.utilities.NetworkUtils;
-import com.google.gson.reflect.TypeToken;
 
-import java.io.InputStream;
-import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
+/**
+ * The main activity which shows an grid view of movies.
+ *
+ * @author Julia Mattjus
+ */
 public class MainActivity extends AppCompatActivity implements TheMovieDbAdapter.TheMovieDbAdapterOnClickHandler {
 
     private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String LIFECYCLE_CALLBACKS_TEXT_KEY = "callbacks";
 
     private RecyclerView mRecyclerView;
     private TheMovieDbAdapter mTheMovieDbAdapter;
@@ -68,21 +72,41 @@ public class MainActivity extends AppCompatActivity implements TheMovieDbAdapter
         mTheMovieDbAdapter = new TheMovieDbAdapter(this);
         mRecyclerView.setAdapter(mTheMovieDbAdapter);
 
-        loadMovieData();
+        if(savedInstanceState != null
+                && savedInstanceState.containsKey(LIFECYCLE_CALLBACKS_TEXT_KEY)) {
+                ArrayList<Movie> movies = savedInstanceState
+                        .getParcelableArrayList(LIFECYCLE_CALLBACKS_TEXT_KEY);
+                Log.d(TAG, "onCreate movies: " + JsonUtility.toJson(movies));
+                showMovieDataView();
+                mTheMovieDbAdapter.setMovies(movies);
+        } else {
+            loadMovieData(NetworkUtils.Sorting.POPULAR);
+        }
     }
 
-    private void loadMovieData() {
+    /**
+     * This method will start a new task that fetches movies according to the specified sorting.
+     *
+     * @param sorting The sorting to use when requesting movies from THe Movie DB
+     */
+    private void loadMovieData(NetworkUtils.Sorting sorting) {
         showMovieDataView();
 
-        new FetchMoviesTask().execute(NetworkUtils.Sorting.POPULAR);
+        new FetchMoviesTask().execute(sorting);
     }
 
+    /**
+     * This method is overridden by our MainActivity class in order to handle RecyclerView item
+     * clicks.
+     *
+     * @param movie The movie that was clicked
+     */
     @Override
     public void onClick(Movie movie) {
         Context context = this;
         Class destinationClass = DetailActivity.class;
         Intent intentToStartDetailActivity = new Intent(context, destinationClass);
-        intentToStartDetailActivity.putExtra("Movie", movie);
+        intentToStartDetailActivity.putExtra(Intent.EXTRA_UID, movie.getId());
         startActivity(intentToStartDetailActivity);
     }
 
@@ -110,13 +134,13 @@ public class MainActivity extends AppCompatActivity implements TheMovieDbAdapter
             }
 
             NetworkUtils.Sorting sorting = params[0];
-            URL url = NetworkUtils.buildUrl(sorting, readApiKey());
+            URL url = NetworkUtils.buildUrl(sorting, ApiKeyUtility.readApiKey(getResources()));
 
             try {
                 String jsonResponse = NetworkUtils
                         .getResponseFromHttpUrl(url);
 
-                Log.v(TAG, "jsonResponse: " + jsonResponse);
+                Log.d(TAG, "FetchMoviesTask - jsonResponse: " + jsonResponse);
                 TheMovieDbResponse response = JsonUtility.fromJson(jsonResponse, TheMovieDbResponse.class);
 
                 return response.getResults();
@@ -134,25 +158,41 @@ public class MainActivity extends AppCompatActivity implements TheMovieDbAdapter
 
             if(movies != null) {
                 showMovieDataView();
-                Log.v(TAG, "movies: " + JsonUtility.toJson(movies));
-                mTheMovieDbAdapter.setMMovies(movies);
+                Log.d(TAG, "onPostExecute movies: " + JsonUtility.toJson(movies));
+                mTheMovieDbAdapter.setMovies(movies);
             } else {
                 showErrorMessage();
             }
         }
     }
 
-    private String readApiKey() {
-        try {
-            Resources res = getResources();
-            InputStream in_s = res.openRawResource(R.raw.the_movie_db);
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main, menu);
+        return true;
+    }
 
-            byte[] b = new byte[in_s.available()];
-            in_s.read(b);
-            return new String(b);
-        } catch (Exception e) {
-            Log.e(TAG, "Unable to read API file the_movie_db.txt", e);
-            return "";
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_popular) {
+            loadMovieData(NetworkUtils.Sorting.POPULAR);
+            return true;
+        } else if (id == R.id.action_top_rated) {
+            loadMovieData(NetworkUtils.Sorting.TOP_RATED);
+            return true;
         }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        ArrayList<Movie> movies = (ArrayList<Movie>) mTheMovieDbAdapter.getMMovies();
+        Log.d(TAG, "onSaveInstanceState movies: " + JsonUtility.toJson(movies));
+        outState.putParcelableArrayList(LIFECYCLE_CALLBACKS_TEXT_KEY, movies);
     }
 }

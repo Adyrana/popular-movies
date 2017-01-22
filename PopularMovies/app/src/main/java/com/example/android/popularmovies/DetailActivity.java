@@ -17,27 +17,46 @@
 package com.example.android.popularmovies;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.android.popularmovies.data.Movie;
+import com.example.android.popularmovies.data.MovieDetailedInfo;
+import com.example.android.popularmovies.utilities.ApiKeyUtility;
+import com.example.android.popularmovies.utilities.JsonUtility;
 import com.example.android.popularmovies.utilities.NetworkUtils;
 import com.squareup.picasso.Picasso;
 
-/**
- * Created by Julia on 2017-01-20.
- */
+import java.net.URL;
+import java.util.ArrayList;
 
+/**
+ * Detailed activity for movies
+ *
+ * @author Julia Mattjus
+ */
 public class DetailActivity extends AppCompatActivity {
 
     private static final String TAG = DetailActivity.class.getSimpleName();
+    private static final String LIFECYCLE_CALLBACKS_TEXT_KEY = "callbacks";
+
+    MovieDetailedInfo mMovie;
+
+    private LinearLayout mDetailedMovieLinearLayout;
+    private TextView mErrorMessageDisplay;
+    private ProgressBar mLoadingIndicator;
 
     private TextView mTitleTextView;
     private ImageView mMoviePosterImageView;
     private TextView mReleaseDateTextView;
+    private TextView mRuntimeTextView;
     private TextView mRatingTextView;
     private TextView mSynposisTextView;
 
@@ -46,19 +65,92 @@ public class DetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
+        mDetailedMovieLinearLayout = (LinearLayout) findViewById(R.id.ll_detailed_movie);
+        mErrorMessageDisplay = (TextView) findViewById(R.id.tv_detail_error_message_display);
+        mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_detail_loading_indicator);
+
         mTitleTextView = (TextView) findViewById(R.id.tv_title);
         mMoviePosterImageView = (ImageView) findViewById(R.id.iv_poster);
         mReleaseDateTextView = (TextView) findViewById(R.id.tv_release_date);
+        mRuntimeTextView = (TextView) findViewById(R.id.tv_runtime);
         mRatingTextView = (TextView) findViewById(R.id.tv_rating);
         mSynposisTextView = (TextView) findViewById(R.id.tv_synopsis);
 
-        Intent intentThatStartedThisActivity = getIntent();
+        if(savedInstanceState != null
+                && savedInstanceState.containsKey(LIFECYCLE_CALLBACKS_TEXT_KEY)) {
+            mMovie = savedInstanceState
+                    .getParcelable(LIFECYCLE_CALLBACKS_TEXT_KEY);
+            Log.d(TAG, "onCreate mMovie: " + JsonUtility.toJson(mMovie));
+            populate(mMovie);
+        } else {
+            Intent intentThatStartedThisActivity = getIntent();
 
-        if (intentThatStartedThisActivity != null) {
-            Movie movie = (Movie) intentThatStartedThisActivity.getSerializableExtra("Movie");
+            if (intentThatStartedThisActivity != null) {
+                Integer movieId = intentThatStartedThisActivity.getIntExtra(Intent.EXTRA_UID, 0);
+
+                new FetchMovieTask().execute(movieId);
+            }
+        }
+    }
+
+    private void showMovieDetailedDataView() {
+        mDetailedMovieLinearLayout.setVisibility(View.VISIBLE);
+        mErrorMessageDisplay.setVisibility(View.INVISIBLE);
+    }
+
+    private void showErrorMessage() {
+        mErrorMessageDisplay.setVisibility(View.VISIBLE);
+        mDetailedMovieLinearLayout.setVisibility(View.INVISIBLE);
+    }
+
+    public class FetchMovieTask extends AsyncTask<Integer, Void, MovieDetailedInfo> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mLoadingIndicator.setVisibility(View.VISIBLE);
+        }
+
+        @Override
+        protected MovieDetailedInfo doInBackground(Integer... params) {
+            if (params.length == 0) {
+                return null;
+            }
+
+            Integer movieId = params[0];
+            URL url = NetworkUtils.buildMovieURL(movieId, ApiKeyUtility.readApiKey(getResources()));
+
+            try {
+                String jsonResponse = NetworkUtils
+                        .getResponseFromHttpUrl(url);
+
+                Log.d(TAG, "FetchMovieTask - jsonResponse: " + jsonResponse);
+                MovieDetailedInfo response = JsonUtility.fromJson(jsonResponse, MovieDetailedInfo.class);
+
+                return response;
+
+            } catch (Exception e) {
+                Log.e(TAG, e.getMessage(), e);
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(MovieDetailedInfo movie) {
+            super.onPostExecute(movie);
+            mLoadingIndicator.setVisibility(View.INVISIBLE);
+            populate(movie);
+        }
+    }
+
+    private void populate(MovieDetailedInfo movie) {
+        mMovie = movie;
+
+        if(movie != null) {
+            Log.d(TAG, "populate - movie: " + JsonUtility.toJson(movie));
+
             String posterPath = NetworkUtils.buildPosterUrl(movie.getPosterPath());
-            Log.v(TAG, "movie.getPosterPath(): " + movie.getPosterPath());
-            Log.v(TAG, "posterPath: " + posterPath);
+            Log.d(TAG, "populate - movie.getPosterPath(): " + movie.getPosterPath());
+            Log.d(TAG, "populate - posterPath: " + posterPath);
 
             String releaseDate = movie.getReleaseDate();
             int dashPosition = movie.getReleaseDate().indexOf("-");
@@ -66,12 +158,23 @@ public class DetailActivity extends AppCompatActivity {
                 releaseDate = releaseDate.substring(0, dashPosition);
             }
 
-
             mTitleTextView.setText(movie.getTitle());
             Picasso.with(mMoviePosterImageView.getContext()).load(posterPath).into(mMoviePosterImageView);
             mReleaseDateTextView.setText(releaseDate);
-            mRatingTextView.setText(movie.getVoteAverage().toString() + "/10");
+            mRuntimeTextView.setText(movie.getRuntime().toString() + getResources().getString(R.string.detail_minutes));
+            mRatingTextView.setText(movie.getVoteAverage().toString() + getResources().getString(R.string.detail_of_ten));
             mSynposisTextView.setText(movie.getOverview());
+
+            showMovieDetailedDataView();
+        } else {
+            showErrorMessage();
         }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.d(TAG, "onSaveInstanceState mMovie: " + JsonUtility.toJson(mMovie));
+        outState.putParcelable(LIFECYCLE_CALLBACKS_TEXT_KEY, mMovie);
     }
 }

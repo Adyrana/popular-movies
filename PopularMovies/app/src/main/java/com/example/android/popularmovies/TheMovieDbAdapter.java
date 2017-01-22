@@ -17,14 +17,14 @@
 package com.example.android.popularmovies;
 
 import android.content.Context;
-import android.media.Image;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.example.android.popularmovies.data.Movie;
 import com.example.android.popularmovies.utilities.NetworkUtils;
@@ -32,15 +32,19 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-/**
- * Created by Julia on 2017-01-20.
- */
+import lombok.Getter;
 
+/**
+ * {@link TheMovieDbAdapter} exposes a list of movies to a
+ * {@link android.support.v7.widget.RecyclerView}
+ *
+ * @author Julia Mattjus
+ */
 public class TheMovieDbAdapter extends RecyclerView.Adapter<TheMovieDbAdapter.TheMovieDbAdapterViewHolder> {
 
     private static final String TAG = TheMovieDbAdapter.class.getSimpleName();
 
-    private List<Movie> mMovies;
+    private @Getter List<Movie> mMovies;
 
     private final TheMovieDbAdapterOnClickHandler mClickHandler;
 
@@ -51,10 +55,19 @@ public class TheMovieDbAdapter extends RecyclerView.Adapter<TheMovieDbAdapter.Th
         void onClick(Movie movieData);
     }
 
+    /**
+     * Creates a TheMovieDbAdapter
+     *
+     * @param clickHandler The on-click handler for this adapter. This single handler is called
+     *                     when an item is clicked.
+     */
     public TheMovieDbAdapter(TheMovieDbAdapterOnClickHandler clickHandler) {
         mClickHandler = clickHandler;
     }
 
+    /**
+     * Cache of the children views for a movie list item.
+     */
     public class TheMovieDbAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public final ImageView mMoviePosterImageView;
 
@@ -92,8 +105,8 @@ public class TheMovieDbAdapter extends RecyclerView.Adapter<TheMovieDbAdapter.Th
     public void onBindViewHolder(TheMovieDbAdapterViewHolder theMovieDbAdapterViewHolder, int position) {
         Movie movie = mMovies.get(position);
         String posterPath = NetworkUtils.buildPosterUrl(movie.getPosterPath());
-        Log.v(TAG, "movie.getPosterPath(): " + movie.getPosterPath());
-        Log.v(TAG, "posterPath: " + posterPath);
+        Log.d(TAG, "movie.getPosterPath(): " + movie.getPosterPath());
+        Log.d(TAG, "posterPath: " + posterPath);
         Picasso.with(theMovieDbAdapterViewHolder.mMoviePosterImageView.getContext()).load(posterPath).into(theMovieDbAdapterViewHolder.mMoviePosterImageView);
     }
 
@@ -104,10 +117,11 @@ public class TheMovieDbAdapter extends RecyclerView.Adapter<TheMovieDbAdapter.Th
     }
 
     /**
+     * Set the movies for a TheMovieDbAdapter
      *
      * @param movies
      */
-    public void setMMovies(List<Movie> movies) {
+    public void setMovies(List<Movie> movies) {
         this.mMovies = movies;
         notifyDataSetChanged();
     }
