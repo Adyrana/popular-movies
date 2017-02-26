@@ -30,31 +30,44 @@ import static net.simonvt.schematic.annotation.DataType.Type.INTEGER;
 import static net.simonvt.schematic.annotation.DataType.Type.TEXT;
 
 /**
- * @author Julia Mattjus
+ * Created by Julia on 2017-02-26.
  */
-public class GenreProvider {
-    public interface GenreColumns {
+
+public class VideosProvider {
+    public interface VideosColumns {
         @DataType(INTEGER) @PrimaryKey String _ID = "_id";
 
+        @DataType(TEXT) @NotNull String ISO_639_1 = "iso_639_1";
+
+        @DataType(TEXT) @NotNull String ISO_3166_1 = "iso_3166_1";
+
+        @DataType(TEXT) @NotNull String KEY = "key";
+
         @DataType(TEXT) @NotNull String NAME = "name";
+
+        @DataType(TEXT) @NotNull String SITE = "site";
+
+        @DataType(INTEGER) @NotNull String SIZE = "size";
+
+        @DataType(TEXT) @NotNull String TYPE = "type";
     }
 
-    @Database(version = GenreDatabase.VERSION)
-    public final class GenreDatabase {
+    @Database(version = VideosDatabase.VERSION)
+    public final class VideosDatabase {
         public static final int VERSION = 1;
 
-        @Table(GenreColumns.class) public static final String GENRE = "genre";
+        @Table(VideosColumns.class) public static final String VIDEOS = "videos";
     }
 
-    public static final String AUTHORITY = "com.example.android.popularmovies.data.db.GenreProvider";
+    public static final String AUTHORITY = "com.example.android.popularmovies.data.db.VideosProvider";
 
-    @TableEndpoint(table = GenreDatabase.GENRE) public static class Genre {
+    @TableEndpoint(table = VideosDatabase.VIDEOS) public static class Videos {
 
         @ContentUri(
-                path = "genre",
-                type = "vnd.android.cursor.dir/genre",
-                defaultSort = GenreColumns._ID
+                path = "videos",
+                type = "vnd.android.cursor.dir/videos",
+                defaultSort = VideosColumns._ID
         )
-        public static final Uri GENRE = Uri.parse("content://" + AUTHORITY + "/genre");
+        public static final Uri VIDEOS = Uri.parse("content://" + AUTHORITY + "/videos");
     }
 }

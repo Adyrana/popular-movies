@@ -32,8 +32,8 @@ import static net.simonvt.schematic.annotation.DataType.Type.TEXT;
 /**
  * @author Julia Mattjus
  */
-public class ReviewProvider {
-    public interface ReviewColumns {
+public class ReviewsProvider {
+    public interface ReviewsColumns {
         @DataType(INTEGER) @PrimaryKey String _ID = "_id";
 
         @DataType(TEXT) @NotNull String AUTHOR = "author";
@@ -51,22 +51,22 @@ public class ReviewProvider {
         @DataType(TEXT) @NotNull String URL = "url";
     }
 
-    @Database(version = ReviewDatabase.VERSION)
-    public final class ReviewDatabase {
+    @Database(version = ReviewsDatabase.VERSION)
+    public final class ReviewsDatabase {
         public static final int VERSION = 1;
 
-        @Table(ReviewColumns.class) public static final String REVIEW = "review";
+        @Table(ReviewsColumns.class) public static final String REVIEWS = "reviews";
     }
 
-    public static final String AUTHORITY = "com.example.android.popularmovies.data.db.ReviewProvider";
+    public static final String AUTHORITY = "com.example.android.popularmovies.data.db.ReviewsProvider";
 
-    @TableEndpoint(table = ReviewDatabase.REVIEW) public static class Review {
+    @TableEndpoint(table = ReviewsDatabase.REVIEWS) public static class Reviews {
 
         @ContentUri(
-                path = "review",
-                type = "vnd.android.cursor.dir/review",
-                defaultSort = ReviewColumns._ID
+                path = "reviews",
+                type = "vnd.android.cursor.dir/reviews",
+                defaultSort = ReviewsColumns._ID
         )
-        public static final Uri REVIEW = Uri.parse("content://" + AUTHORITY + "/review");
+        public static final Uri REVIEWS = Uri.parse("content://" + AUTHORITY + "/reviews");
     }
 }

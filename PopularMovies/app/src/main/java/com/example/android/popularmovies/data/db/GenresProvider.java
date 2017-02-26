@@ -26,34 +26,35 @@ import net.simonvt.schematic.annotation.PrimaryKey;
 import net.simonvt.schematic.annotation.Table;
 import net.simonvt.schematic.annotation.TableEndpoint;
 
+import static net.simonvt.schematic.annotation.DataType.Type.INTEGER;
 import static net.simonvt.schematic.annotation.DataType.Type.TEXT;
 
 /**
  * @author Julia Mattjus
  */
-public class SpokenLanguageProvider {
-    public interface SpokenLanguageColumns {
-        @DataType(TEXT) @PrimaryKey String ISO_639_1 = "iso_639_1";
+public class GenresProvider {
+    public interface GenresColumns {
+        @DataType(INTEGER) @PrimaryKey String _ID = "_id";
 
         @DataType(TEXT) @NotNull String NAME = "name";
     }
 
-    @Database(version = SpokenLanguageDatabase.VERSION)
-    public final class SpokenLanguageDatabase {
+    @Database(version = GenresDatabase.VERSION)
+    public final class GenresDatabase {
         public static final int VERSION = 1;
 
-        @Table(SpokenLanguageColumns.class) public static final String SPOKEN_LANGUAGE = "spoken_language";
+        @Table(GenresColumns.class) public static final String GENRES = "genres";
     }
 
-    public static final String AUTHORITY = "com.example.android.popularmovies.data.db.SpokenLanguageProvider";
+    public static final String AUTHORITY = "com.example.android.popularmovies.data.db.GenresProvider";
 
-    @TableEndpoint(table = SpokenLanguageDatabase.SPOKEN_LANGUAGE) public static class SpokenLanguage {
+    @TableEndpoint(table = GenresDatabase.GENRES) public static class Genres {
 
         @ContentUri(
-                path = "spoken_language",
-                type = "vnd.android.cursor.dir/spoken_language",
-                defaultSort = SpokenLanguageColumns.ISO_639_1
+                path = "genres",
+                type = "vnd.android.cursor.dir/genres",
+                defaultSort = GenresColumns._ID
         )
-        public static final Uri SPOKEN_LANGUAGE = Uri.parse("content://" + AUTHORITY + "/spoken_language");
+        public static final Uri GENRES = Uri.parse("content://" + AUTHORITY + "/genres");
     }
 }

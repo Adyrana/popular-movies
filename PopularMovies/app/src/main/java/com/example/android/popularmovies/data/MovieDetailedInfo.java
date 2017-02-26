@@ -26,6 +26,7 @@ package com.example.android.popularmovies.data;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -34,6 +35,7 @@ import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Data class for detailed movie info.
@@ -48,6 +50,7 @@ import lombok.Data;
  * @author Julia Mattjus
  */
 @AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class MovieDetailedInfo implements Parcelable {
     @SerializedName("adult")

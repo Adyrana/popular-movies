@@ -16,7 +16,7 @@ import lombok.Data;
 public class Video implements Parcelable {
 
     @SerializedName("id")
-    private String id;
+    private Integer id;
 
     @SerializedName("iso_639_1")
     private String iso6391;
@@ -46,7 +46,7 @@ public class Video implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.id);
+        dest.writeInt(this.id);
         dest.writeString(this.iso6391);
         dest.writeString(this.iso31661);
         dest.writeString(this.key);
@@ -57,7 +57,7 @@ public class Video implements Parcelable {
     }
 
     protected Video(Parcel in) {
-        this.id = in.readString();
+        this.id = in.readInt();
         this.iso6391 = in.readString();
         this.iso31661 = in.readString();
         this.key = in.readString();
