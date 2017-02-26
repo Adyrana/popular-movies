@@ -125,6 +125,11 @@ public class MovieDetailedInfo implements Parcelable {
     @SerializedName("vote_count")
     private Integer voteCount;
 
+    @SerializedName("videos")
+    private Videos videos;
+
+    @SerializedName("reviews")
+    private Reviews reviews;
 
     @Override
     public int describeContents() {
@@ -137,7 +142,7 @@ public class MovieDetailedInfo implements Parcelable {
         dest.writeString(this.backdropPath);
         dest.writeParcelable(this.belongsToCollection, flags);
         dest.writeValue(this.budget);
-        dest.writeList(this.genres);
+        dest.writeTypedList(this.genres);
         dest.writeString(this.homepage);
         dest.writeValue(this.id);
         dest.writeString(this.imdbId);
@@ -146,18 +151,20 @@ public class MovieDetailedInfo implements Parcelable {
         dest.writeString(this.overview);
         dest.writeValue(this.popularity);
         dest.writeString(this.posterPath);
-        dest.writeList(this.productionCompanies);
-        dest.writeList(this.productionCountries);
+        dest.writeTypedList(this.productionCompanies);
+        dest.writeTypedList(this.productionCountries);
         dest.writeString(this.releaseDate);
         dest.writeValue(this.revenue);
         dest.writeValue(this.runtime);
-        dest.writeList(this.spokenLanguages);
+        dest.writeTypedList(this.spokenLanguages);
         dest.writeString(this.status);
         dest.writeString(this.tagline);
         dest.writeString(this.title);
         dest.writeValue(this.video);
         dest.writeValue(this.voteAverage);
         dest.writeValue(this.voteCount);
+        dest.writeParcelable(this.videos, flags);
+        dest.writeParcelable(this.reviews, flags);
     }
 
     protected MovieDetailedInfo(Parcel in) {
@@ -165,8 +172,7 @@ public class MovieDetailedInfo implements Parcelable {
         this.backdropPath = in.readString();
         this.belongsToCollection = in.readParcelable(MovieCollection.class.getClassLoader());
         this.budget = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.genres = new ArrayList<Genre>();
-        in.readList(this.genres, Genre.class.getClassLoader());
+        this.genres = in.createTypedArrayList(Genre.CREATOR);
         this.homepage = in.readString();
         this.id = (Integer) in.readValue(Integer.class.getClassLoader());
         this.imdbId = in.readString();
@@ -175,21 +181,20 @@ public class MovieDetailedInfo implements Parcelable {
         this.overview = in.readString();
         this.popularity = (Double) in.readValue(Double.class.getClassLoader());
         this.posterPath = in.readString();
-        this.productionCompanies = new ArrayList<ProductionCompanies>();
-        in.readList(this.productionCompanies, ProductionCompanies.class.getClassLoader());
-        this.productionCountries = new ArrayList<ProductionCountries>();
-        in.readList(this.productionCountries, ProductionCountries.class.getClassLoader());
+        this.productionCompanies = in.createTypedArrayList(ProductionCompanies.CREATOR);
+        this.productionCountries = in.createTypedArrayList(ProductionCountries.CREATOR);
         this.releaseDate = in.readString();
         this.revenue = (Integer) in.readValue(Integer.class.getClassLoader());
         this.runtime = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.spokenLanguages = new ArrayList<SpokenLanguages>();
-        in.readList(this.spokenLanguages, SpokenLanguages.class.getClassLoader());
+        this.spokenLanguages = in.createTypedArrayList(SpokenLanguages.CREATOR);
         this.status = in.readString();
         this.tagline = in.readString();
         this.title = in.readString();
         this.video = (Boolean) in.readValue(Boolean.class.getClassLoader());
         this.voteAverage = (Double) in.readValue(Double.class.getClassLoader());
         this.voteCount = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.videos = in.readParcelable(Videos.class.getClassLoader());
+        this.reviews = in.readParcelable(Reviews.class.getClassLoader());
     }
 
     public static final Parcelable.Creator<MovieDetailedInfo> CREATOR = new Parcelable.Creator<MovieDetailedInfo>() {
