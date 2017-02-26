@@ -30,44 +30,35 @@ import static net.simonvt.schematic.annotation.DataType.Type.INTEGER;
 import static net.simonvt.schematic.annotation.DataType.Type.TEXT;
 
 /**
- * Created by Julia on 2017-02-26.
+ * @author Julia Mattjus
  */
-
-public class VideoProvider {
-    public interface VideoColumns {
+public class MovieCollectionsProvider {
+    public interface MovieCollectionsColumns {
         @DataType(INTEGER) @PrimaryKey String _ID = "_id";
-
-        @DataType(TEXT) @NotNull String ISO_639_1 = "iso_639_1";
-
-        @DataType(TEXT) @NotNull String ISO_3166_1 = "iso_3166_1";
-
-        @DataType(TEXT) @NotNull String KEY = "key";
 
         @DataType(TEXT) @NotNull String NAME = "name";
 
-        @DataType(TEXT) @NotNull String SITE = "site";
+        @DataType(TEXT) @NotNull String POSTER_PATH = "poster_path";
 
-        @DataType(INTEGER) @NotNull String SIZE = "size";
-
-        @DataType(TEXT) @NotNull String TYPE = "type";
+        @DataType(TEXT) @NotNull String BACKDROP_PATH = "backdrop_path";
     }
 
-    @Database(version = VideoDatabase.VERSION)
-    public final class VideoDatabase {
+    @Database(version = MovieCollectionsDatabase.VERSION)
+    public final class MovieCollectionsDatabase {
         public static final int VERSION = 1;
 
-        @Table(VideoColumns.class) public static final String VIDEO = "video";
+        @Table(MovieCollectionsColumns.class) public static final String MOVIE_COLLECTIONS = "movie_collections";
     }
 
-    public static final String AUTHORITY = "com.example.android.popularmovies.data.db.VideoProvider";
+    public static final String AUTHORITY = "com.example.android.popularmovies.data.db.MovieCollectionsProvider";
 
-    @TableEndpoint(table = VideoDatabase.VIDEO) public static class Video {
+    @TableEndpoint(table = MovieCollectionsDatabase.MOVIE_COLLECTIONS) public static class MovieCollections {
 
         @ContentUri(
-                path = "video",
-                type = "vnd.android.cursor.dir/video",
-                defaultSort = VideoColumns._ID
+                path = "movie_collections",
+                type = "vnd.android.cursor.dir/movie_collections",
+                defaultSort = MovieCollectionsColumns._ID
         )
-        public static final Uri VIDEO = Uri.parse("content://" + AUTHORITY + "/video");
+        public static final Uri MOVIE_COLLECTIONS = Uri.parse("content://" + AUTHORITY + "/movie_collections");
     }
 }

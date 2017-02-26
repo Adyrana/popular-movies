@@ -16,7 +16,7 @@ import lombok.Data;
 public class Review implements Parcelable {
 
     @SerializedName("id")
-    private String id;
+    private Integer id;
 
     @SerializedName("author")
     private String author;
@@ -46,7 +46,7 @@ public class Review implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.id);
+        dest.writeInt(this.id);
         dest.writeString(this.author);
         dest.writeString(this.content);
         dest.writeString(this.iso6391);
@@ -57,7 +57,7 @@ public class Review implements Parcelable {
     }
 
     protected Review(Parcel in) {
-        this.id = in.readString();
+        this.id = in.readInt();
         this.author = in.readString();
         this.content = in.readString();
         this.iso6391 = in.readString();

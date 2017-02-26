@@ -26,39 +26,34 @@ import net.simonvt.schematic.annotation.PrimaryKey;
 import net.simonvt.schematic.annotation.Table;
 import net.simonvt.schematic.annotation.TableEndpoint;
 
-import static net.simonvt.schematic.annotation.DataType.Type.INTEGER;
 import static net.simonvt.schematic.annotation.DataType.Type.TEXT;
 
 /**
  * @author Julia Mattjus
  */
-public class MovieCollectionProvider {
-    public interface MovieCollectionColumns {
-        @DataType(INTEGER) @PrimaryKey String _ID = "_id";
+public class SpokenLanguagesProvider {
+    public interface SpokenLanguagesColumns {
+        @DataType(TEXT) @PrimaryKey String ISO_639_1 = "iso_639_1";
 
         @DataType(TEXT) @NotNull String NAME = "name";
-
-        @DataType(TEXT) @NotNull String POSTER_PATH = "poster_path";
-
-        @DataType(TEXT) @NotNull String BACKDROP_PATH = "backdrop_path";
     }
 
-    @Database(version = MovieCollectionDatabase.VERSION)
-    public final class MovieCollectionDatabase {
+    @Database(version = SpokenLanguagesDatabase.VERSION)
+    public final class SpokenLanguagesDatabase {
         public static final int VERSION = 1;
 
-        @Table(MovieCollectionColumns.class) public static final String MOVIE_COLLECTION = "movie_collection";
+        @Table(SpokenLanguagesColumns.class) public static final String SPOKEN_LANGUAGES = "spoken_languages";
     }
 
-    public static final String AUTHORITY = "com.example.android.popularmovies.data.db.MovieCollectionProvider";
+    public static final String AUTHORITY = "com.example.android.popularmovies.data.db.SpokenLanguagesProvider";
 
-    @TableEndpoint(table = MovieCollectionDatabase.MOVIE_COLLECTION) public static class MovieCollection {
+    @TableEndpoint(table = SpokenLanguagesDatabase.SPOKEN_LANGUAGES) public static class SpokenLanguages {
 
         @ContentUri(
-                path = "movie_collection",
-                type = "vnd.android.cursor.dir/movie_collection",
-                defaultSort = MovieCollectionColumns._ID
+                path = "spoken_languages",
+                type = "vnd.android.cursor.dir/spoken_languages",
+                defaultSort = SpokenLanguagesColumns.ISO_639_1
         )
-        public static final Uri MOVIE_COLLECTION = Uri.parse("content://" + AUTHORITY + "/movie_collection");
+        public static final Uri SPOKEN_LANGUAGES = Uri.parse("content://" + AUTHORITY + "/spoken_languages");
     }
 }
