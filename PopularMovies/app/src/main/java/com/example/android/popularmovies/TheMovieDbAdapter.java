@@ -100,7 +100,7 @@ public class TheMovieDbAdapter extends RecyclerView.Adapter<TheMovieDbAdapter.Th
     @Override
     public void onBindViewHolder(TheMovieDbAdapterViewHolder theMovieDbAdapterViewHolder, int position) {
         Movie movie = mMovies.get(position);
-        String posterPath = NetworkUtils.buildPosterUrl(movie.getPosterPath());
+        String posterPath = NetworkUtils.buildImageUrl(movie.getPosterPath(), NetworkUtils.ImageQuality.W342);
         Log.d(TAG, "movie.getPosterPath(): " + movie.getPosterPath());
         Log.d(TAG, "posterPath: " + posterPath);
 

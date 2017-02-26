@@ -26,6 +26,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
 
+import lombok.Getter;
+
 /**
  * Network utility class for building urls and making requests.
  *
@@ -36,20 +38,27 @@ public class NetworkUtils {
         POPULAR, TOP_RATED
     }
 
+    public enum ImageQuality {
+        W92("w92"), W154("w154"), W185("w185"), W342("w342"), W500("w500"), W780("w780");
+
+        private @Getter String quality;
+
+        ImageQuality(String quality) {
+            this.quality = quality;
+        }
+    }
+
     private static final String TAG = NetworkUtils.class.getSimpleName();
 
     private static final String THE_MOVIE_DB_URL = "http://api.themoviedb.org/3/movie/";
-    private static final String THE_MOVIE_DB_POSTER_URL = "http://image.tmdb.org/t/p/";
+    private static final String THE_MOVIE_DB_IMAGE_URL = "http://image.tmdb.org/t/p/";
     private static final String POPULAR = "popular";
     private static final String TOP_RATED = "top_rated";
     private static final String API_KEY = "api_key";
-    private static final String W92 = "w92";
-    private static final String W154 = "w154";
-    private static final String W185 = "w185";
-    private static final String W342 = "w342";
-    private static final String W500 = "w500";
-    private static final String W780 = "w780";
     private static final String SEPARATOR = "/";
+    private static final String APPEND_TO_RESPONSE = "append_to_response";
+    private static final String VIDEOS = "videos";
+    private static final String REVIEWS = "reviews";
 
     private static final String format = "json";
 
@@ -89,6 +98,7 @@ public class NetworkUtils {
         Uri builtUri = Uri.parse(THE_MOVIE_DB_URL).buildUpon()
                 .appendPath(movieId.toString())
                 .appendQueryParameter(API_KEY, apiKey)
+                .appendQueryParameter(APPEND_TO_RESPONSE, VIDEOS + "," + REVIEWS)
                 .build();
 
         URL url = null;
@@ -120,9 +130,9 @@ public class NetworkUtils {
      * @param posterPath Path to the poster
      * @return The URL as a String to use to get The Movie DB posters with
      */
-    public static String buildPosterUrl(String posterPath) {
-        String url = THE_MOVIE_DB_POSTER_URL + W342 + SEPARATOR + posterPath;
-        Log.d(TAG, "buildPosterUrl: " + url);
+    public static String buildImageUrl(String posterPath, ImageQuality imageQuality) {
+        String url = THE_MOVIE_DB_IMAGE_URL + imageQuality.getQuality() + SEPARATOR + posterPath;
+        Log.d(TAG, "buildImageUrl: " + url);
         return url;
     }
 
