@@ -45,6 +45,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * The main activity which shows an grid view of movies.
  *
@@ -55,15 +58,16 @@ public class MainActivity extends AppCompatActivity implements TheMovieDbAdapter
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final String LIFECYCLE_CALLBACKS_TEXT_KEY = "callbacks";
 
-    private RecyclerView mRecyclerView;
+    @BindView(R.id.recyclerview_movies) RecyclerView mRecyclerView;
+    @BindView(R.id.tv_error_message_display) TextView mErrorMessageDisplay;
+    @BindView(R.id.pb_loading_indicator) ProgressBar mLoadingIndicator;
     private TheMovieDbAdapter mTheMovieDbAdapter;
-    private TextView mErrorMessageDisplay;
-    private ProgressBar mLoadingIndicator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movielist);
+        ButterKnife.bind(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -72,10 +76,6 @@ public class MainActivity extends AppCompatActivity implements TheMovieDbAdapter
 //        actionBar.setDisplayShowHomeEnabled(true);
 //        actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setDisplayShowCustomEnabled(true);
-
-        mRecyclerView = (RecyclerView) findViewById(R.id.recyclerview_movies);
-        mErrorMessageDisplay = (TextView) findViewById(R.id.tv_error_message_display);
-        mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
 
         GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
         mRecyclerView.setLayoutManager(layoutManager);

@@ -20,11 +20,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -35,6 +37,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.android.popularmovies.data.MovieDetailedInfo;
+import com.example.android.popularmovies.data.db.movies.MovieDetailedInfosProvider;
 import com.example.android.popularmovies.utilities.ApiKeyUtility;
 import com.example.android.popularmovies.utilities.JsonUtility;
 import com.example.android.popularmovies.utilities.NetworkUtils;
@@ -42,72 +45,202 @@ import com.squareup.picasso.Picasso;
 
 import java.net.URL;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 /**
  * Detailed activity for movies
  *
  * @author Julia Mattjus
  */
-public class DetailActivity extends AppCompatActivity {
+public class DetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<MovieDetailedInfo> {
+
+    @Override
+    public Loader<MovieDetailedInfo> onCreateLoader(int loaderId, Bundle args) {
+        final Context context = this;
+
+        mCurrentLoader = loaderId;
+
+        switch (loaderId) {
+            case FAVOURITE_LOADER_ID:
+                return new AsyncTaskLoader<MovieDetailedInfo>(context) {
+
+                    MovieDetailedInfo mTaskData = null;
+
+                    @Override
+                    protected void onStartLoading () {
+                        setBothInvisible();
+                        mLoadingIndicator.setVisibility(View.VISIBLE);
+
+                        if (mTaskData != null) {
+                            deliverResult(mTaskData);
+                        } else {
+                            forceLoad();
+                        }
+                    }
+
+                    @Override
+                    public MovieDetailedInfo loadInBackground() {
+                        return MovieDetailedInfosProvider.getFavourite(context, mMovieId);
+                    }
+
+                    public void deliverResult(MovieDetailedInfo data) {
+                        mTaskData = data;
+                        super.deliverResult(data);
+                    }
+                };
+            case THE_MOVIE_DB_LOADER_ID:
+                return new AsyncTaskLoader<MovieDetailedInfo>(context) {
+
+                    MovieDetailedInfo mTaskData = null;
+
+                    @Override
+                    protected void onStartLoading () {
+                        if (mTaskData != null) {
+                            deliverResult(mTaskData);
+                        } else {
+                            forceLoad();
+                        }
+                    }
+
+                    @Override
+                    public MovieDetailedInfo loadInBackground() {
+                        URL url = NetworkUtils.buildMovieURL(mMovieId, ApiKeyUtility.readApiKey(getResources()));
+
+                        try {
+                            String jsonResponse = NetworkUtils
+                                    .getResponseFromHttpUrl(url);
+
+                            Log.d(TAG, "FetchMovieTask - jsonResponse: " + jsonResponse);
+                            MovieDetailedInfo response = JsonUtility.fromJson(jsonResponse, MovieDetailedInfo.class);
+
+                            return response;
+
+                        } catch (Exception e) {
+                            Log.e(TAG, e.getMessage(), e);
+                            return null;
+                        }
+                    }
+
+                    public void deliverResult(MovieDetailedInfo data) {
+                        mTaskData = data;
+                        super.deliverResult(data);
+                    }
+                };
+            default:
+                return null;
+        }
+    }
+
+    @Override
+    public void onLoadFinished(Loader<MovieDetailedInfo> loader, MovieDetailedInfo data) {
+        switch (loader.getId()) {
+            case FAVOURITE_LOADER_ID:
+                if(data == null) {
+                    if(isOnline()) {
+                        getSupportLoaderManager().initLoader(THE_MOVIE_DB_LOADER_ID, null, this);
+                    } else {
+                        mCurrentLoader = FAVOURITE_LOADER_ID;
+                        showErrorMessage();
+                    }
+                } else {
+                    setFloatingActionButton(true);
+                    mMovie = data;
+                    mLoadingIndicator.setVisibility(View.INVISIBLE);
+                    populate(data);
+                    mCurrentLoader = FAVOURITE_LOADER_ID;
+                }
+                break;
+            case THE_MOVIE_DB_LOADER_ID:
+                mMovie = data;
+                mLoadingIndicator.setVisibility(View.INVISIBLE);
+                populate(data);
+                mCurrentLoader = FAVOURITE_LOADER_ID;
+                break;
+            default:
+                break;
+        }
+    }
+
+    @Override
+    public void onLoaderReset(Loader<MovieDetailedInfo> loader) {
+        mMovie = null;
+        mMovieId = null;
+        mCurrentLoader = FAVOURITE_LOADER_ID;
+    }
+
+    private MovieDetailedInfo mMovie;
+    private Boolean mIsFavourite = false;
+    private Integer mMovieId;
+    private int mCurrentLoader = FAVOURITE_LOADER_ID;
 
     private static final String TAG = DetailActivity.class.getSimpleName();
     private static final String LIFECYCLE_CALLBACKS_TEXT_KEY = "callbacks";
 
-    MovieDetailedInfo mMovie;
+    private static final int FAVOURITE_LOADER_ID = 1;
+    private static final int THE_MOVIE_DB_LOADER_ID = 2;
 
-    private ConstraintLayout mConstraintLayout;
-    private TextView mErrorMessageDisplay;
-    private ProgressBar mLoadingIndicator;
-    private FloatingActionButton mFloatingActionButton;
+    @BindView(R.id.constraint_layout) ConstraintLayout mConstraintLayout;
+    @BindView(R.id.tv_detail_error_message_display) TextView mErrorMessageDisplay;
+    @BindView(R.id.pb_detail_loading_indicator) ProgressBar mLoadingIndicator;
+    @BindView(R.id.floatingActionButton) FloatingActionButton mFloatingActionButton;
 
-    private TextView mTitleTextView;
-    private ImageView mMoviePosterImageView;
-    private ImageView mMovieBackdropImageView;
-    private TextView mReleaseDateTextView;
-    private TextView mRuntimeTextView;
-    private TextView mRatingTextView;
-    private TextView mSynposisTextView;
+    @BindView(R.id.tv_title) TextView mTitleTextView;
+    @BindView(R.id.iv_poster) ImageView mMoviePosterImageView;
+    @BindView(R.id.iv_backdrop) ImageView mMovieBackdropImageView;
+    @BindView(R.id.tv_release_date) TextView mReleaseDateTextView;
+    @BindView(R.id.tv_runtime) TextView mRuntimeTextView;
+    @BindView(R.id.tv_rating) TextView mRatingTextView;
+    @BindView(R.id.tv_synopsis) TextView mSynposisTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
-
-        mFloatingActionButton = (FloatingActionButton) findViewById(R.id.floatingActionButton);
-        mConstraintLayout = (ConstraintLayout) findViewById(R.id.constraint_layout);
-        mErrorMessageDisplay = (TextView) findViewById(R.id.tv_detail_error_message_display);
-        mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_detail_loading_indicator);
-
-        mTitleTextView = (TextView) findViewById(R.id.tv_title);
-        mMoviePosterImageView = (ImageView) findViewById(R.id.iv_poster);
-        mMovieBackdropImageView = (ImageView) findViewById(R.id.iv_backdrop);
-        mReleaseDateTextView = (TextView) findViewById(R.id.tv_release_date);
-        mRuntimeTextView = (TextView) findViewById(R.id.tv_runtime);
-        mRatingTextView = (TextView) findViewById(R.id.tv_rating);
-        mSynposisTextView = (TextView) findViewById(R.id.tv_synopsis);
+        ButterKnife.bind(this);
 
         initActionBar();
-        setFloatingActionButton(false);
 
-        if(savedInstanceState != null
-                && savedInstanceState.containsKey(LIFECYCLE_CALLBACKS_TEXT_KEY)) {
-            mMovie = savedInstanceState
-                    .getParcelable(LIFECYCLE_CALLBACKS_TEXT_KEY);
+        mFloatingActionButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                if(mIsFavourite) {
+                    setFloatingActionButton(false);
+                    MovieDetailedInfosProvider.removeFavourite(v.getContext(), mMovie);
+                } else {
+                    setFloatingActionButton(true);
+                    MovieDetailedInfosProvider.write(v.getContext(), mMovie);
+                }
+            }
+        });
+
+        if(savedInstanceState != null && savedInstanceState.containsKey(LIFECYCLE_CALLBACKS_TEXT_KEY)) {
+            mMovie = savedInstanceState.getParcelable(LIFECYCLE_CALLBACKS_TEXT_KEY);
+            mMovieId = mMovie.getId();
             Log.d(TAG, "onCreate mMovie: " + JsonUtility.toJson(mMovie));
             populate(mMovie);
         } else {
+            Log.d(TAG, "onCreate Movie data needs to be loaded");
             Intent intentThatStartedThisActivity = getIntent();
 
             if (intentThatStartedThisActivity != null) {
-                Integer movieId = intentThatStartedThisActivity.getIntExtra(Intent.EXTRA_UID, 0);
+                mMovieId = intentThatStartedThisActivity.getIntExtra(Intent.EXTRA_UID, 0);
+                Log.d(TAG, "onCreate movieId: " + mMovieId);
 
-                if(isOnline()) {
-                    new FetchMovieTask().execute(movieId);
-                } else {
-                    showErrorMessage();
-                }
+                getSupportLoaderManager().initLoader(FAVOURITE_LOADER_ID, null, this);
             }
         }
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        getSupportLoaderManager().restartLoader(mCurrentLoader, null, this);
+    }
+
+
 
     private void initActionBar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -121,6 +254,8 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     private void setFloatingActionButton(boolean on) {
+        mIsFavourite = on;
+
         int star = on ? R.drawable.ic_star_on : R.drawable.ic_star_off;
 
         mFloatingActionButton.setImageDrawable(ContextCompat.getDrawable(this, star));
@@ -139,46 +274,6 @@ public class DetailActivity extends AppCompatActivity {
     private void showErrorMessage() {
         mErrorMessageDisplay.setVisibility(View.VISIBLE);
         mConstraintLayout.setVisibility(View.INVISIBLE);
-    }
-
-    public class FetchMovieTask extends AsyncTask<Integer, Void, MovieDetailedInfo> {
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            setBothInvisible();
-            mLoadingIndicator.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected MovieDetailedInfo doInBackground(Integer... params) {
-            if (params.length == 0) {
-                return null;
-            }
-
-            Integer movieId = params[0];
-            URL url = NetworkUtils.buildMovieURL(movieId, ApiKeyUtility.readApiKey(getResources()));
-
-            try {
-                String jsonResponse = NetworkUtils
-                        .getResponseFromHttpUrl(url);
-
-                Log.d(TAG, "FetchMovieTask - jsonResponse: " + jsonResponse);
-                MovieDetailedInfo response = JsonUtility.fromJson(jsonResponse, MovieDetailedInfo.class);
-
-                return response;
-
-            } catch (Exception e) {
-                Log.e(TAG, e.getMessage(), e);
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(MovieDetailedInfo movie) {
-            super.onPostExecute(movie);
-            mLoadingIndicator.setVisibility(View.INVISIBLE);
-            populate(movie);
-        }
     }
 
     private void populate(MovieDetailedInfo movie) {

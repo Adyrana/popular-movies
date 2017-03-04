@@ -53,7 +53,7 @@ public class MovieCollection implements Parcelable {
     @SerializedName("name")
     private String name;
 
-    @SerializedName("poster_path")
+    @SerializedName("posterPath")
     private String posterPath;
 
     @SerializedName("backdrop_path")

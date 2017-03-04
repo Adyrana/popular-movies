@@ -40,6 +40,38 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
+        <provider
+            android:name="com.example.android.popularmovies.data.db.genres.generated.GenresProvider"
+            android:authorities="com.example.android.popularmovies.data.db.genres.GenresProvider"
+            android:exported="false"/>
+        <provider
+            android:name="com.example.android.popularmovies.data.db.moviecollection.generated.MovieCollectionProvider"
+            android:authorities="com.example.android.popularmovies.data.db.moviecollection.MovieCollectionProvider"
+            android:exported="false"/>
+        <provider
+            android:name="com.example.android.popularmovies.data.db.movies.generated.MovieDetailedInfosProvider"
+            android:authorities="com.example.android.popularmovies.data.db.movies.MovieDetailedInfosProvider"
+            android:exported="false"/>
+        <provider
+            android:name="com.example.android.popularmovies.data.db.productioncompanies.generated.ProductionCompaniesProvider"
+            android:authorities="com.example.android.popularmovies.data.db.productioncompanies.ProductionCompaniesProvider"
+            android:exported="false"/>
+        <provider
+            android:name="com.example.android.popularmovies.data.db.productioncountries.generated.ProductionCountriesProvider"
+            android:authorities="com.example.android.popularmovies.data.db.productioncountries.ProductionCountriesProvider"
+            android:exported="false"/>
+        <provider
+            android:name="com.example.android.popularmovies.data.db.reviews.generated.ReviewsProvider"
+            android:authorities="com.example.android.popularmovies.data.db.reviews.ReviewsProvider"
+            android:exported="false"/>
+        <provider
+            android:name="com.example.android.popularmovies.data.db.spokenlanguages.generated.SpokenLanguagesProvider"
+            android:authorities="com.example.android.popularmovies.data.db.spokenlanguages.SpokenLanguagesProvider"
+            android:exported="false"/>
+        <provider
+            android:name="com.example.android.popularmovies.data.db.videos.generated.VideosProvider"
+            android:authorities="com.example.android.popularmovies.data.db.videos.VideosProvider"
+            android:exported="false"/>
     </application>
 
 </manifest>
