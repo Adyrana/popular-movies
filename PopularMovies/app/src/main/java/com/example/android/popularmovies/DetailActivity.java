@@ -55,6 +55,77 @@ import butterknife.ButterKnife;
  */
 public class DetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<MovieDetailedInfo> {
 
+    private MovieDetailedInfo mMovie;
+    private Boolean mIsFavourite = false;
+    private Integer mMovieId;
+    private int mCurrentLoader = FAVOURITE_LOADER_ID;
+
+    private static final String TAG = DetailActivity.class.getSimpleName();
+    private static final String LIFECYCLE_CALLBACKS_TEXT_KEY = "callbacks";
+
+    private static final int FAVOURITE_LOADER_ID = 1;
+    private static final int THE_MOVIE_DB_LOADER_ID = 2;
+
+    @BindView(R.id.constraint_layout) ConstraintLayout mConstraintLayout;
+    @BindView(R.id.tv_detail_error_message_display) TextView mErrorMessageDisplay;
+    @BindView(R.id.pb_detail_loading_indicator) ProgressBar mLoadingIndicator;
+    @BindView(R.id.floatingActionButton) FloatingActionButton mFloatingActionButton;
+
+    @BindView(R.id.tv_title) TextView mTitleTextView;
+    @BindView(R.id.iv_poster) ImageView mMoviePosterImageView;
+    @BindView(R.id.iv_backdrop) ImageView mMovieBackdropImageView;
+    @BindView(R.id.tv_release_date) TextView mReleaseDateTextView;
+    @BindView(R.id.tv_runtime) TextView mRuntimeTextView;
+    @BindView(R.id.tv_rating) TextView mRatingTextView;
+    @BindView(R.id.tv_synopsis) TextView mSynposisTextView;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_detail);
+        ButterKnife.bind(this);
+
+        initActionBar();
+
+        mFloatingActionButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                if(mIsFavourite) {
+                    setFloatingActionButton(false);
+                    MovieDetailedInfosProvider.removeFavourite(v.getContext(), mMovie);
+                } else {
+                    setFloatingActionButton(true);
+                    MovieDetailedInfosProvider.write(v.getContext(), mMovie);
+                }
+            }
+        });
+
+        if(savedInstanceState != null && savedInstanceState.containsKey(LIFECYCLE_CALLBACKS_TEXT_KEY)) {
+            mMovie = savedInstanceState.getParcelable(LIFECYCLE_CALLBACKS_TEXT_KEY);
+            mMovieId = mMovie.getId();
+            Log.d(TAG, "onCreate mMovie: " + JsonUtility.toJson(mMovie));
+            populate(mMovie);
+        } else {
+            Log.d(TAG, "onCreate Movie data needs to be loaded");
+            Intent intentThatStartedThisActivity = getIntent();
+
+            if (intentThatStartedThisActivity != null) {
+                mMovieId = intentThatStartedThisActivity.getIntExtra(Intent.EXTRA_UID, 0);
+                Log.d(TAG, "onCreate movieId: " + mMovieId);
+
+                getSupportLoaderManager().initLoader(FAVOURITE_LOADER_ID, null, this);
+            }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        getSupportLoaderManager().restartLoader(mCurrentLoader, null, this);
+    }
+
     @Override
     public Loader<MovieDetailedInfo> onCreateLoader(int loaderId, Bundle args) {
         final Context context = this;
@@ -169,79 +240,6 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         mCurrentLoader = FAVOURITE_LOADER_ID;
     }
 
-    private MovieDetailedInfo mMovie;
-    private Boolean mIsFavourite = false;
-    private Integer mMovieId;
-    private int mCurrentLoader = FAVOURITE_LOADER_ID;
-
-    private static final String TAG = DetailActivity.class.getSimpleName();
-    private static final String LIFECYCLE_CALLBACKS_TEXT_KEY = "callbacks";
-
-    private static final int FAVOURITE_LOADER_ID = 1;
-    private static final int THE_MOVIE_DB_LOADER_ID = 2;
-
-    @BindView(R.id.constraint_layout) ConstraintLayout mConstraintLayout;
-    @BindView(R.id.tv_detail_error_message_display) TextView mErrorMessageDisplay;
-    @BindView(R.id.pb_detail_loading_indicator) ProgressBar mLoadingIndicator;
-    @BindView(R.id.floatingActionButton) FloatingActionButton mFloatingActionButton;
-
-    @BindView(R.id.tv_title) TextView mTitleTextView;
-    @BindView(R.id.iv_poster) ImageView mMoviePosterImageView;
-    @BindView(R.id.iv_backdrop) ImageView mMovieBackdropImageView;
-    @BindView(R.id.tv_release_date) TextView mReleaseDateTextView;
-    @BindView(R.id.tv_runtime) TextView mRuntimeTextView;
-    @BindView(R.id.tv_rating) TextView mRatingTextView;
-    @BindView(R.id.tv_synopsis) TextView mSynposisTextView;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_detail);
-        ButterKnife.bind(this);
-
-        initActionBar();
-
-        mFloatingActionButton.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                if(mIsFavourite) {
-                    setFloatingActionButton(false);
-                    MovieDetailedInfosProvider.removeFavourite(v.getContext(), mMovie);
-                } else {
-                    setFloatingActionButton(true);
-                    MovieDetailedInfosProvider.write(v.getContext(), mMovie);
-                }
-            }
-        });
-
-        if(savedInstanceState != null && savedInstanceState.containsKey(LIFECYCLE_CALLBACKS_TEXT_KEY)) {
-            mMovie = savedInstanceState.getParcelable(LIFECYCLE_CALLBACKS_TEXT_KEY);
-            mMovieId = mMovie.getId();
-            Log.d(TAG, "onCreate mMovie: " + JsonUtility.toJson(mMovie));
-            populate(mMovie);
-        } else {
-            Log.d(TAG, "onCreate Movie data needs to be loaded");
-            Intent intentThatStartedThisActivity = getIntent();
-
-            if (intentThatStartedThisActivity != null) {
-                mMovieId = intentThatStartedThisActivity.getIntExtra(Intent.EXTRA_UID, 0);
-                Log.d(TAG, "onCreate movieId: " + mMovieId);
-
-                getSupportLoaderManager().initLoader(FAVOURITE_LOADER_ID, null, this);
-            }
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        getSupportLoaderManager().restartLoader(mCurrentLoader, null, this);
-    }
-
-
-
     private void initActionBar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -263,16 +261,19 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
     private void setBothInvisible() {
         mConstraintLayout.setVisibility(View.INVISIBLE);
+        mFloatingActionButton.setVisibility(View.INVISIBLE);
         mErrorMessageDisplay.setVisibility(View.INVISIBLE);
     }
 
     private void showMovieDetailedDataView() {
         mConstraintLayout.setVisibility(View.VISIBLE);
+        mFloatingActionButton.setVisibility(View.VISIBLE);
         mErrorMessageDisplay.setVisibility(View.INVISIBLE);
     }
 
     private void showErrorMessage() {
         mErrorMessageDisplay.setVisibility(View.VISIBLE);
+        mFloatingActionButton.setVisibility(View.INVISIBLE);
         mConstraintLayout.setVisibility(View.INVISIBLE);
     }
 
