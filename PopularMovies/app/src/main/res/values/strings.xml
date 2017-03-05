@@ -18,6 +18,8 @@
     <string name="error">An error occurred. Please try again...</string>
     <string name="action_most_popular">Most Popular</string>
     <string name="action_top_rated">Top Rated</string>
+    <string name="action_favourites">Favourites</string>
+    <string name="action_about">About</string>
     <string name="detail_title">Title - should be replaced</string>
     <string name="detail_release_date">Release date - should be replaced</string>
     <string name="detail_runtime">Runtime - should be replaced</string>
@@ -25,4 +27,18 @@
     <string name="detail_synopsis">Synopsis - should be replaced</string>
     <string name="detail_minutes">min</string>
     <string name="detail_of_ten">/10</string>
+    <string name="action_settings">Settings</string>
+    <string name="aboutLibraries_description_showIcon">true</string>
+    <string name="aboutLibraries_description_showVersion">true</string>
+    <string name="aboutLibraries_description_text">Project 2 app for the Udacity course Associate Android Developer Fast Track.</string>
+    <string name="define_Lombok"></string>
+    <string name="library_Lombok_author">The Project Lombok Authors</string>
+    <string name="library_Lombok_authorWebsite">https://projectlombok.org</string>
+    <string name="library_Lombok_libraryName">Project Lombok</string>
+    <string name="library_Lombok_libraryDescription">Project Lombok makes java a spicier language by adding \'handlers\' that know how to build and compile simple, boilerplate-free, not-quite-java code.</string>
+    <string name="library_Lombok_libraryVersion">1.16.12</string>
+    <string name="library_Lombok_libraryWebsite">http://projectlombok.org/</string>
+    <string name="library_Lombok_licenseId">mit</string>
+    <string name="library_Lombok_isOpenSource">true</string>
+    <string name="library_Lombok_repositoryLink">https://github.com/rzwitserloot/lombok</string>
 </resources>

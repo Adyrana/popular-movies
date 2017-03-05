@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.support.v4.content.CursorLoader;
 import android.util.Log;
 
 import com.example.android.popularmovies.data.Genre;
@@ -78,6 +79,14 @@ public final class MovieDetailedInfosProvider {
     public static final int INDEX_MOVIE_INFO_VOTE_COUNT = 24;
     public static final int INDEX_MOVIE_INFO_VIDEOS = 25;
     public static final int INDEX_MOVIE_INFO_REVIEWS = 26;
+
+    public static final int INDEX_MAIN_MOVIE_PROJECTION_ID = 0;
+    public static final int INDEX_MAIN_MOVIE_PROJECTION_POSTER_PATH = 1;
+
+    public static final String[] MAIN_MOVIES_PROJECTION = {
+            MovieDetailedInfosColumns._ID,
+            MovieDetailedInfosColumns.POSTER_PATH,
+    };
 
     private static final String TAG = MovieDetailedInfosProvider.class.getSimpleName();
 
@@ -176,6 +185,31 @@ public final class MovieDetailedInfosProvider {
         return isFavourite;
     }
 
+    public static Cursor getFavouritesCursor(Context context) {
+        String sortOrder = MovieDetailedInfosColumns.TITLE + " ASC";
+
+        Cursor cursor = context.getContentResolver().query(
+                MovieDetailedInfosProvider.MovieDetailedInfos.MOVIE_DETAILED_INFOS,
+                MAIN_MOVIES_PROJECTION,
+                null,
+                null,
+                sortOrder);
+
+        if(cursor == null) {
+            return null;
+        }
+
+        return cursor;
+    }
+
+    public static Integer getMovieIdFromMainProjectionCursor(Cursor cursor) {
+        return cursor.getInt(INDEX_MAIN_MOVIE_PROJECTION_ID);
+    }
+
+    public static String getPosterPathFromMainProjectionCursor(Cursor cursor) {
+        return cursor.getString(INDEX_MAIN_MOVIE_PROJECTION_POSTER_PATH);
+    }
+
     public static List<Movie> getFavourites(Context context) {
         Cursor cursor = context.getContentResolver().query(
                 MovieDetailedInfosProvider.MovieDetailedInfos.MOVIE_DETAILED_INFOS,
@@ -246,7 +280,7 @@ public final class MovieDetailedInfosProvider {
                 new String[] { movieId.toString() });
     }
 
-    private static Movie getMovieFromCursor(Context context, Cursor cursor) {
+    public static Movie getMovieFromCursor(Context context, Cursor cursor) {
 
         Integer id = cursor.getInt(INDEX_MOVIE_INFO_ID);
         Boolean adult = cursor.getInt(INDEX_MOVIE_INFO_ADULT) == 1 ? true : false;

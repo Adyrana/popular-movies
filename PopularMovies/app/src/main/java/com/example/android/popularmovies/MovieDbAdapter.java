@@ -17,6 +17,8 @@
 package com.example.android.popularmovies;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,44 +26,45 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.example.android.popularmovies.data.Movie;
+import com.example.android.popularmovies.data.db.movies.MovieDetailedInfosProvider;
 import com.example.android.popularmovies.utilities.NetworkUtils;
 import com.squareup.picasso.Picasso;
 
-import java.util.List;
-
 /**
- * {@link TheMovieDbAdapter} exposes a list of movies to a
+ * {@link MovieDbAdapter} exposes a list of movies to a
  * {@link android.support.v7.widget.RecyclerView}
  *
  * @author Julia Mattjus
  */
-public class TheMovieDbAdapter extends RecyclerView.Adapter<TheMovieDbAdapter.TheMovieDbAdapterViewHolder> {
-
-    private static final String TAG = TheMovieDbAdapter.class.getSimpleName();
-
-    private List<Movie> mMovies;
+public class MovieDbAdapter extends RecyclerView.Adapter<MovieDbAdapter.MovieDbAdapterViewHolder> {
+    private static final String TAG = MovieDbAdapter.class.getSimpleName();
 
     private final IMovieAdapterOnClickHandler mClickHandler;
 
+    private final Context mContext;
+    private Cursor mCursor;
+
     /**
-     * Creates a TheMovieDbAdapter
+     * Creates a MovieDbAdapter
      *
+     * @param context      Used to talk to the UI and app resources
      * @param clickHandler The on-click handler for this adapter. This single handler is called
      *                     when an item is clicked.
      */
-    public TheMovieDbAdapter(IMovieAdapterOnClickHandler clickHandler) {
+    public MovieDbAdapter(@NonNull Context context, IMovieAdapterOnClickHandler clickHandler) {
+        mContext = context;
         mClickHandler = clickHandler;
     }
 
     /**
      * Cache of the children views for a movie list item.
      */
-    public class TheMovieDbAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class MovieDbAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public final ImageView mMoviePosterImageView;
 
-        public TheMovieDbAdapterViewHolder(View view) {
+        public MovieDbAdapterViewHolder(View view) {
             super(view);
+            Log.d(TAG, "MovieDbAdapterViewHolder!!");
             mMoviePosterImageView = (ImageView) view.findViewById(R.id.iv_movie_poster);
             view.setOnClickListener(this);
         }
@@ -73,50 +76,50 @@ public class TheMovieDbAdapter extends RecyclerView.Adapter<TheMovieDbAdapter.Th
          */
         @Override
         public void onClick(View v) {
+            Log.d(TAG, "MovieDbAdapterViewHolder!! Click");
             int adapterPosition = getAdapterPosition();
-            Movie movie = mMovies.get(adapterPosition);
-            mClickHandler.onClick(movie.getId());
+            mCursor.moveToPosition(adapterPosition);
+            Integer movieId = MovieDetailedInfosProvider.getMovieIdFromMainProjectionCursor(mCursor);
+            mClickHandler.onClick(movieId);
         }
     }
 
     @Override
-    public TheMovieDbAdapterViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+    public MovieDbAdapterViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         Context context = viewGroup.getContext();
         int layoutIdForListItem = R.layout.movie_list_item;
         LayoutInflater inflater = LayoutInflater.from(context);
         boolean shouldAttachToParentImmediately = false;
 
         View view = inflater.inflate(layoutIdForListItem, viewGroup, shouldAttachToParentImmediately);
-        return new TheMovieDbAdapterViewHolder(view);
+        return new MovieDbAdapterViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(TheMovieDbAdapterViewHolder theMovieDbAdapterViewHolder, int position) {
-        Movie movie = mMovies.get(position);
-        String posterPath = NetworkUtils.buildImageUrl(movie.getPosterPath(), NetworkUtils.ImageQuality.W342);
-        Log.d(TAG, "movie.getPosterPath(): " + movie.getPosterPath());
-        Log.d(TAG, "posterPath: " + posterPath);
+    public void onBindViewHolder(MovieDbAdapterViewHolder movieDbAdapterViewHolder, int position) {
+        Log.d(TAG, "onBindViewHolder - position: " + position);
+        mCursor.moveToPosition(position);
+        String posterPath = MovieDetailedInfosProvider.getPosterPathFromMainProjectionCursor(mCursor);
+        String posterUrl = NetworkUtils.buildImageUrl(posterPath, NetworkUtils.ImageQuality.W342);
 
-        Picasso.with(theMovieDbAdapterViewHolder.mMoviePosterImageView.getContext()).load(posterPath).into(theMovieDbAdapterViewHolder.mMoviePosterImageView);
+        Log.d(TAG, "posterPath: " + posterUrl);
+
+        Picasso.with(movieDbAdapterViewHolder.mMoviePosterImageView.getContext()).load(posterUrl).into(movieDbAdapterViewHolder.mMoviePosterImageView);
     }
 
     @Override
     public int getItemCount() {
-        if (null == mMovies) return 0;
-        return mMovies.size();
+        if (null == mCursor) return 0;
+        return mCursor.getCount();
     }
 
-    public List<Movie> getMovies() {
-        return mMovies;
+    public int getPosition() {
+        return mCursor.getPosition();
     }
 
-    /**
-     * Set the movies for a TheMovieDbAdapter
-     *
-     * @param movies
-     */
-    public void setMovies(List<Movie> movies) {
-        this.mMovies = movies;
+    public void swapCursor(Cursor newCursor) {
+        Log.d(TAG, "swapCursor!!!");
+        mCursor = newCursor;
         //notifyDataSetChanged();
     }
 }
