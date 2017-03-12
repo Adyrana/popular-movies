@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:paddingBottom="16dp">
+
+    <TextView
+        android:id="@+id/tv_review_author"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Author"
+        android:textSize="20sp"
+        android:layout_marginLeft="10dp"
+        android:gravity="bottom" />
+
+    <com.ms.square.android.expandabletextview.ExpandableTextView
+        android:id="@+id/expand_tv_review"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:maxCollapsedLines="4">
+
+        <TextView
+            android:id="@+id/expandable_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:textSize="12sp" />
+        <ImageButton
+            android:id="@+id/expand_collapse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="16dp"
+            android:layout_gravity="right|bottom"
+            android:background="#00000000"/>
+    </com.ms.square.android.expandabletextview.ExpandableTextView>
+
+</LinearLayout>

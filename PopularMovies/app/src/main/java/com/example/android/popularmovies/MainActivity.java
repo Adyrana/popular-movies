@@ -105,8 +105,12 @@ public class MainActivity extends AppCompatActivity implements IMovieAdapterOnCl
         mMovieDbAdapter = new MovieDbAdapter(this, this);
         mRecyclerView.setAdapter(mTheMovieDbAdapter);
 
-        mSource = MoviesSource.THE_MOVIE_DB; // Default source
         mSorting = NetworkUtils.Sorting.POPULAR; // Default sorting
+        if(isOnline()) {
+            mSource = MoviesSource.THE_MOVIE_DB; // Default source
+        } else {
+            mSource = MoviesSource.DATABASE; // Default source
+        }
 
         if(savedInstanceState != null && savedInstanceState.containsKey(LIFECYCLE_CALLBACKS_SOURCE_KEY)) {
 
@@ -127,6 +131,15 @@ public class MainActivity extends AppCompatActivity implements IMovieAdapterOnCl
                 loadMovieData();
             }
         } else {
+            loadMovieData();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(mSource != null && mSource == MoviesSource.DATABASE && mMovieDbAdapter != null) {
+            mPosition = mMovieDbAdapter.getPosition();
             loadMovieData();
         }
     }

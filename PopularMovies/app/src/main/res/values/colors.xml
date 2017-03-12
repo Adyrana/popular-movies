@@ -24,6 +24,7 @@
     <color name="primaryText">#212121</color>
     <color name="secondaryText">#757575</color>
     <color name="divider">#BDBDBD</color>
+    <color name="startHighLight">#FFEE00</color>
     <!--<color name="detailedMovieHeader"></color>
     <color name="detailedMovieText"></color>
     <color name="darkText"></color>

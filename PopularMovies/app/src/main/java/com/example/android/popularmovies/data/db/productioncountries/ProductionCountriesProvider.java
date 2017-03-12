@@ -6,6 +6,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
 
+import com.example.android.popularmovies.utilities.JsonUtility;
+
 import net.simonvt.schematic.annotation.ContentProvider;
 import net.simonvt.schematic.annotation.ContentUri;
 import net.simonvt.schematic.annotation.TableEndpoint;
@@ -40,13 +42,16 @@ public final class ProductionCountriesProvider {
 
     public static void write(Context context, Integer movieId, List<com.example.android.popularmovies.data.ProductionCountries> productionCountries) {
 
+        Log.d(TAG, "write - movieId \"" + movieId + "\" genres \"" + JsonUtility.toJson(productionCountries) + "\"");
+
         List<ContentValues> contentValuesList = new ArrayList<ContentValues>();
 
-        for(com.example.android.popularmovies.data.ProductionCountries productionCountrie : productionCountries) {
+        for(com.example.android.popularmovies.data.ProductionCountries productionCountry : productionCountries) {
             ContentValues contentValues = new ContentValues();
             contentValues.put(ProductionCountriesColumns.MOVIE_ID, movieId);
-            contentValues.put(ProductionCountriesColumns.ISO_3166_1, productionCountrie.getIso31661());
-            contentValues.put(ProductionCountriesColumns.NAME, productionCountrie.getName());
+            contentValues.put(ProductionCountriesColumns.ISO_3166_1, productionCountry.getIso31661());
+            contentValues.put(ProductionCountriesColumns.NAME, productionCountry.getName());
+            contentValuesList.add(contentValues);
         }
 
         context.getContentResolver().bulkInsert(ProductionCountries.PRODUCTION_COUNTRIES, contentValuesList.toArray(new ContentValues[contentValuesList.size()]));
@@ -82,16 +87,20 @@ public final class ProductionCountriesProvider {
                 new String[] { movieId.toString() },
                 null);
 
-        if(cursor == null || !cursor.moveToFirst()) {
-            return productionCountries;
-        }
+        try {
+            if (cursor == null || !cursor.moveToFirst()) {
+                return productionCountries;
+            }
 
-        productionCountries.add(getProductionCountriesFromCursor(cursor));
-        while(cursor.moveToNext()) {
             productionCountries.add(getProductionCountriesFromCursor(cursor));
-        }
+            while (cursor.moveToNext()) {
+                productionCountries.add(getProductionCountriesFromCursor(cursor));
+            }
 
-        return productionCountries;
+            return productionCountries;
+        } finally {
+            cursor.close();
+        }
     }
 
     private static com.example.android.popularmovies.data.ProductionCountries getProductionCountriesFromCursor(Cursor cursor) {

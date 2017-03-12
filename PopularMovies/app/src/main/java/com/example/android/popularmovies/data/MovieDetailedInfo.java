@@ -24,6 +24,7 @@
 
 package com.example.android.popularmovies.data;
 
+import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -200,7 +201,7 @@ public class MovieDetailedInfo implements Parcelable {
         this.reviews = in.readParcelable(Reviews.class.getClassLoader());
     }
 
-    public static final Parcelable.Creator<MovieDetailedInfo> CREATOR = new Parcelable.Creator<MovieDetailedInfo>() {
+    public static final Creator<MovieDetailedInfo> CREATOR = new Creator<MovieDetailedInfo>() {
         @Override
         public MovieDetailedInfo createFromParcel(Parcel source) {
             return new MovieDetailedInfo(source);

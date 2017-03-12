@@ -91,11 +91,15 @@ public final class MovieCollectionProvider {
                 new String[] { movieId.toString() },
                 null);
 
-        if(cursor == null || !cursor.moveToFirst()) {
-            return null;
-        }
+        try {
+            if(cursor == null || !cursor.moveToFirst()) {
+                return null;
+            }
 
-        return getMovieCollectionFromCursor(cursor);
+            return getMovieCollectionFromCursor(cursor);
+        } finally {
+            cursor.close();
+        }
     }
 
     private static com.example.android.popularmovies.data.MovieCollection getMovieCollectionFromCursor(Cursor cursor) {
