@@ -44,6 +44,13 @@ public final class GenresProvider {
 
     private static final String TAG = GenresProvider.class.getSimpleName();
 
+    /**
+     * Method for writing a a list of genres to the database
+     *
+     * @param context
+     * @param movieId
+     * @param genres
+     */
     public static void write(Context context, Integer movieId, List<Genre> genres) {
 
         Log.d(TAG, "write - movieId \"" + movieId + "\" genres \"" + JsonUtility.toJson(genres) + "\"");
@@ -60,6 +67,12 @@ public final class GenresProvider {
         context.getContentResolver().bulkInsert(Genres.GENRES, contentValuesList.toArray(new ContentValues[contentValuesList.size()]));
     }
 
+    /**
+     * Remove genres for a specific movie
+     *
+     * @param context
+     * @param movieId
+     */
     public static void remove(Context context, Integer movieId) {
 
         Log.d(TAG, "remove - movieId: " + movieId);
@@ -74,6 +87,13 @@ public final class GenresProvider {
                 new String[] { movieId.toString() });
     }
 
+    /**
+     * Get all genres for a movie from it's id
+     *
+     * @param context
+     * @param movieId
+     * @return
+     */
     public static List<com.example.android.popularmovies.data.Genre> getGenresFromMovieId(Context context, Integer movieId) {
 
         Log.d(TAG, "getGenresFromMovieId - movieId: " + movieId);
@@ -106,6 +126,12 @@ public final class GenresProvider {
         }
     }
 
+    /**
+     * Get a Genre object from a cursor
+     *
+     * @param cursor
+     * @return
+     */
     private static com.example.android.popularmovies.data.Genre getGenreFromCursor(Cursor cursor) {
         Integer id = cursor.getInt(INDEX_GENRE_ID);
         String name = cursor.getString(INDEX_NAME);

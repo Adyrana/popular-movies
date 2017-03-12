@@ -54,11 +54,19 @@ public class VideoAdapter extends RecyclerView.Adapter<VideoAdapter.VideoViewHol
         return videos.size();
     }
 
+    /**
+     * View holder for the videos
+     */
     public class VideoViewHolder extends RecyclerView.ViewHolder {
         TextView videoName;
         ImageView playButton;
         ImageView shareButton;
 
+        /**
+         * Constructor
+         *
+         * @param itemView
+         */
         public VideoViewHolder(View itemView) {
             super(itemView);
             videoName = (TextView) itemView.findViewById(R.id.tv_video_name);

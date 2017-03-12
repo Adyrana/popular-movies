@@ -63,6 +63,10 @@ import butterknife.ButterKnife;
  */
 public class MainActivity extends AppCompatActivity implements IMovieAdapterOnClickHandler, LoaderManager.LoaderCallbacks<RecyclerView.Adapter> {
 
+    /**
+     * Enum for keeping track of from where movies should be fetched, fro either the local SQLite database
+     * or from The Movie Database online.
+     */
     private enum MoviesSource {
         DATABASE, THE_MOVIE_DB
     }
@@ -105,7 +109,10 @@ public class MainActivity extends AppCompatActivity implements IMovieAdapterOnCl
         mMovieDbAdapter = new MovieDbAdapter(this, this);
         mRecyclerView.setAdapter(mTheMovieDbAdapter);
 
+        // Default sorting is set to be popular movies
         mSorting = NetworkUtils.Sorting.POPULAR; // Default sorting
+        // If the device is online the initial view will fetch movies from The Movie DB, if not
+        // The favourite movies will be shown which can be fetched from the local SQLite database.
         if(isOnline()) {
             mSource = MoviesSource.THE_MOVIE_DB; // Default source
         } else {
@@ -146,7 +153,6 @@ public class MainActivity extends AppCompatActivity implements IMovieAdapterOnCl
 
     /**
      * This method will start a new task that fetches movies according to the specified sorting.
-     *
      */
     private void loadMovieData() {
         showMovieDataView();
@@ -352,6 +358,11 @@ public class MainActivity extends AppCompatActivity implements IMovieAdapterOnCl
         }
     }
 
+    /**
+     * Helper method for checking whether or not the device is online.
+     *
+     * @return
+     */
     private boolean isOnline() {
         ConnectivityManager cm =
                 (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);

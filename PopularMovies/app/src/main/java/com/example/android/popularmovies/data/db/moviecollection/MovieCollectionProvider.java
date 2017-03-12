@@ -42,6 +42,13 @@ public final class MovieCollectionProvider {
 
     private static final String TAG = MovieCollectionProvider.class.getSimpleName();
 
+    /**
+     * Method for writing a movie collection to the database
+     *
+     * @param context
+     * @param movieId
+     * @param movieCollection
+     */
     public static void write(Context context, Integer movieId, com.example.android.popularmovies.data.MovieCollection movieCollection) {
 
         Log.d(TAG, "write - movieCollection: " + JsonUtility.toJson(movieCollection));
@@ -58,6 +65,12 @@ public final class MovieCollectionProvider {
         context.getContentResolver().insert(MovieCollection.MOVIE_COLLECTION, contentValues);
     }
 
+    /**
+     * Helper method to make sure we don't have any null values but rather empty strings in case of null
+     *
+     * @param in
+     * @return
+     */
     private static String getStringOrEmpty(String in) {
         return in != null ? in : "";
     }
@@ -76,6 +89,13 @@ public final class MovieCollectionProvider {
                 new String[] { movieId.toString() });
     }
 
+    /**
+     * Get a movie collection for a movie by the movie id
+     *
+     * @param context
+     * @param movieId
+     * @return
+     */
     public static com.example.android.popularmovies.data.MovieCollection getMovieCollectionFromMovieId(Context context, Integer movieId) {
 
         Log.d(TAG, "getMovieCollectionFromMovieId - movieId: " + movieId);
@@ -102,6 +122,12 @@ public final class MovieCollectionProvider {
         }
     }
 
+    /**
+     * Method for getting a movie collection from a cursor
+     *
+     * @param cursor
+     * @return
+     */
     private static com.example.android.popularmovies.data.MovieCollection getMovieCollectionFromCursor(Cursor cursor) {
         Integer id = cursor.getInt(INDEX_MOVIE_COLLECTION_ID);
         String name = cursor.getString(INDEX_NAME);

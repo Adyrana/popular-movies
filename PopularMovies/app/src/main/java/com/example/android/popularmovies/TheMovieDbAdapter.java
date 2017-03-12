@@ -106,6 +106,11 @@ public class TheMovieDbAdapter extends RecyclerView.Adapter<TheMovieDbAdapter.Th
         return mMovies.size();
     }
 
+    /**
+     * Method for getting the movies for the adapter
+     *
+     * @return
+     */
     public List<Movie> getMovies() {
         return mMovies;
     }

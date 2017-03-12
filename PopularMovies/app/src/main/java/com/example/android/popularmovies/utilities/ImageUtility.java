@@ -8,12 +8,21 @@ import java.io.File;
 import java.io.FileOutputStream;
 
 /**
+ * Utility class for writing and reading images from the local storage, this is used for storing
+ * the images for movies that are set as favourite so that they're accessible when offline.
+ *
  * @author Julia Mattjus
  */
 public class ImageUtility {
 
     private static final String TAG = ImageUtility.class.getSimpleName();
 
+    /**
+     * Helper method for checking whether or not a file is in the internal storage
+     * @param context
+     * @param filename
+     * @return
+     */
     public static boolean hasLocalImageFile(Context context, String filename) {
         final String filenameCorrected = filename.replace("/", "");
         File f = getFileFromPath(context, filenameCorrected);
@@ -24,12 +33,26 @@ public class ImageUtility {
         }
     }
 
+    /**
+     * Helper method for getting a file from the internal storage by its filename
+     *
+     * @param context
+     * @param filename
+     * @return
+     */
     public static File getFileFromPath(Context context, String filename) {
         final String filenameCorrected = filename.replace("/", "");
         Log.d(TAG, "getFileFromPath - context.getFilesDir(): " + context.getFilesDir().getAbsolutePath());
         return new File(context.getFilesDir(), filenameCorrected);
     }
 
+    /**
+     * Method for saving an image to the internal storage
+     *
+     * @param context
+     * @param bitmap
+     * @param filename
+     */
     public static void saveImage(final Context context, final Bitmap bitmap, final String filename) {
         final String imagePath = filename.replace("/", "");
         new Thread(new Runnable() {
@@ -50,6 +73,12 @@ public class ImageUtility {
         }).start();
     }
 
+    /**
+     * Method for removing an image from the internal storage
+     *
+     * @param context
+     * @param filename
+     */
     public static void removeImage(Context context, String filename) {
         String imagePath = filename.replace("/", "");
         if(hasLocalImageFile(context, imagePath)) {

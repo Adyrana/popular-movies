@@ -50,6 +50,13 @@ public final class ReviewsProvider {
 
     private static final String TAG = ReviewsProvider.class.getSimpleName();
 
+    /**
+     * Method for writing a set of reviews to the database
+     *
+     * @param context
+     * @param movieId
+     * @param reviews
+     */
     public static void write(Context context, Integer movieId, com.example.android.popularmovies.data.Reviews reviews) {
 
         Log.d(TAG, "write - movieId \"" + movieId + "\" genres \"" + JsonUtility.toJson(reviews) + "\"");
@@ -73,6 +80,12 @@ public final class ReviewsProvider {
         context.getContentResolver().bulkInsert(Reviews.REVIEWS, contentValuesList.toArray(new ContentValues[contentValuesList.size()]));
     }
 
+    /**
+     * Method for removing reviews for a movie by the movie id
+     *
+     * @param context
+     * @param movieId
+     */
     public static void remove(Context context, Integer movieId) {
 
         Log.d(TAG, "remove - movieId: " + movieId);
@@ -87,6 +100,13 @@ public final class ReviewsProvider {
                 new String[] { movieId.toString() });
     }
 
+    /**
+     * Method for getting reviews for a movie by the movie id
+     *
+     * @param context
+     * @param movieId
+     * @return
+     */
     public static com.example.android.popularmovies.data.Reviews getReviewsFromFromMovieId(Context context, Integer movieId) {
 
         Log.d(TAG, "getReviewsFromFromMovieId - movieId: " + movieId);
@@ -119,6 +139,12 @@ public final class ReviewsProvider {
         }
     }
 
+    /**
+     * Method for getting a review from a cursor
+     *
+     * @param cursor
+     * @return
+     */
     private static Review getReviewFromCursor(Cursor cursor) {
         String id = cursor.getString(INDEX_REVIEW_ID);
         String author = cursor.getString(INDEX_REVIEW_AUTHOR);
