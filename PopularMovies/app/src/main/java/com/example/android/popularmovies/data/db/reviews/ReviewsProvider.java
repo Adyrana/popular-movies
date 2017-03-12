@@ -26,7 +26,8 @@ public final class ReviewsProvider {
     public static final String AUTHORITY = "com.example.android.popularmovies.data.db.reviews.ReviewsProvider";
     static final Uri BASE_CONTENT_URI = Uri.parse("content://" + AUTHORITY);
 
-    @TableEndpoint(table = ReviewsDatabase.REVIEWS) public static class Reviews {
+    @TableEndpoint(table = ReviewsDatabase.REVIEWS)
+    public static class Reviews {
 
         @ContentUri(
                 path = "reviews",
@@ -36,24 +37,29 @@ public final class ReviewsProvider {
         public static final Uri REVIEWS = Uri.parse("content://" + AUTHORITY + "/reviews");
     }
 
-    public static final int INDEX_REVIEW_ID = 0;
-    public static final int INDEX_REVIEW_AUTHOR = 1;
-    public static final int INDEX_REVIEW_CONTENT = 2;
-    public static final int INDEX_REVIEW_ISO_639_1 = 3;
-    public static final int INDEX_REVIEW_MEDIA_ID = 4;
-    public static final int INDEX_REVIEW_MEDIA_TITLE = 5;
-    public static final int INDEX_REVIEW_MEDIA_TYPE = 6;
-    public static final int INDEX_REVIEW_URL = 7;
+    public static final int INDEX_ID = 0;
+    public static final int INDEX_MOVIE_ID = 1;
+    public static final int INDEX_REVIEW_ID = 2;
+    public static final int INDEX_REVIEW_AUTHOR = 3;
+    public static final int INDEX_REVIEW_CONTENT = 4;
+    public static final int INDEX_REVIEW_ISO_639_1 = 5;
+    public static final int INDEX_REVIEW_MEDIA_ID = 6;
+    public static final int INDEX_REVIEW_MEDIA_TITLE = 7;
+    public static final int INDEX_REVIEW_MEDIA_TYPE = 8;
+    public static final int INDEX_REVIEW_URL = 9;
 
     private static final String TAG = ReviewsProvider.class.getSimpleName();
 
-    public static void write(Context context, com.example.android.popularmovies.data.Reviews reviews) {
+    public static void write(Context context, Integer movieId, com.example.android.popularmovies.data.Reviews reviews) {
+
+        Log.d(TAG, "write - movieId \"" + movieId + "\" genres \"" + JsonUtility.toJson(reviews) + "\"");
 
         List<ContentValues> contentValuesList = new ArrayList<ContentValues>();
 
-        for(Review review : reviews.getResults()) {
+        for (Review review : reviews.getResults()) {
             ContentValues contentValues = new ContentValues();
-            contentValues.put(ReviewsColumns._ID, review.getId());
+            contentValues.put(ReviewsColumns.MOVIE_ID, movieId);
+            contentValues.put(ReviewsColumns.REVIEW_ID, review.getId());
             contentValues.put(ReviewsColumns.AUTHOR, review.getAuthor());
             contentValues.put(ReviewsColumns.CONTENT, review.getContent());
             contentValues.put(ReviewsColumns.ISO_639_1, review.getIso6391());
@@ -61,51 +67,56 @@ public final class ReviewsProvider {
             contentValues.put(ReviewsColumns.MEDIA_TITLE, review.getMediaTitle());
             contentValues.put(ReviewsColumns.MEDIA_TYPE, review.getMediaType());
             contentValues.put(ReviewsColumns.URL, review.getUrl());
+            contentValuesList.add(contentValues);
         }
 
         context.getContentResolver().bulkInsert(Reviews.REVIEWS, contentValuesList.toArray(new ContentValues[contentValuesList.size()]));
     }
 
-    public static void remove(Context context, List<String> reviewIds) {
+    public static void remove(Context context, Integer movieId) {
 
-        Log.d(TAG, "remove - reviewIds: " + JsonUtility.toJson(reviewIds.toArray(new String[reviewIds.size()])));
+        Log.d(TAG, "remove - movieId: " + movieId);
 
-        if(reviewIds == null || reviewIds.size() == 0) {
+        if(movieId == null) {
             return;
         }
 
         context.getContentResolver().delete(
                 Reviews.REVIEWS,
-                buildSelection(reviewIds),
-                reviewIds.toArray(new String[reviewIds.size()]));
+                ReviewsColumns.MOVIE_ID + " = ?",
+                new String[] { movieId.toString() });
     }
 
-    public static com.example.android.popularmovies.data.Reviews getReviewsFromFromIds(Context context, List<String> reviewIds) {
+    public static com.example.android.popularmovies.data.Reviews getReviewsFromFromMovieId(Context context, Integer movieId) {
 
-        Log.d(TAG, "getReviewsFromFromIds - reviewIds: " + JsonUtility.toJson(reviewIds));
+        Log.d(TAG, "getReviewsFromFromMovieId - movieId: " + movieId);
         List<Review> reviewsList = new ArrayList<>();
 
-        if(reviewIds == null || reviewIds.size() == 0) {
+        if(movieId == null) {
             return new com.example.android.popularmovies.data.Reviews(1, reviewsList, 1, reviewsList.size());
         }
 
         Cursor cursor = context.getContentResolver().query(
                 Reviews.REVIEWS,
                 null,
-                buildSelection(reviewIds),
-                reviewIds.toArray(new String[reviewIds.size()]),
+                ReviewsColumns.MOVIE_ID + " = ?",
+                new String[] { movieId.toString() },
                 null);
 
-        if(cursor == null || !cursor.moveToFirst()) {
-            return new com.example.android.popularmovies.data.Reviews(1, reviewsList, 1, reviewsList.size());
-        }
+        try {
+            if (cursor == null || !cursor.moveToFirst()) {
+                return new com.example.android.popularmovies.data.Reviews(1, reviewsList, 1, reviewsList.size());
+            }
 
-        reviewsList.add(getReviewFromCursor(cursor));
-        while(cursor.moveToNext()) {
             reviewsList.add(getReviewFromCursor(cursor));
-        }
+            while (cursor.moveToNext()) {
+                reviewsList.add(getReviewFromCursor(cursor));
+            }
 
-        return new com.example.android.popularmovies.data.Reviews(1, reviewsList, 1, reviewsList.size());
+            return new com.example.android.popularmovies.data.Reviews(1, reviewsList, 1, reviewsList.size());
+        } finally {
+            cursor.close();
+        }
     }
 
     private static Review getReviewFromCursor(Cursor cursor) {
@@ -126,13 +137,5 @@ public final class ReviewsProvider {
                 mediaTitle,
                 mediaType,
                 reviewUrl);
-    }
-
-    private static String buildSelection(List<String> ids) {
-        String selection = VideosColumns._ID + " in (";
-        for(int i = 0; i < ids.size(); i++) {
-            selection += "?, ";
-        }
-        return selection.substring(0, selection.length() - 2) + ")";
     }
 }

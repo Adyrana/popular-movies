@@ -117,6 +117,5 @@ public class TheMovieDbAdapter extends RecyclerView.Adapter<TheMovieDbAdapter.Th
      */
     public void setMovies(List<Movie> movies) {
         this.mMovies = movies;
-        //notifyDataSetChanged();
     }
 }

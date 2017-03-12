@@ -18,6 +18,7 @@ package com.example.android.popularmovies;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -27,6 +28,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.example.android.popularmovies.data.db.movies.MovieDetailedInfosProvider;
+import com.example.android.popularmovies.utilities.ImageUtility;
 import com.example.android.popularmovies.utilities.NetworkUtils;
 import com.squareup.picasso.Picasso;
 
@@ -64,7 +66,6 @@ public class MovieDbAdapter extends RecyclerView.Adapter<MovieDbAdapter.MovieDbA
 
         public MovieDbAdapterViewHolder(View view) {
             super(view);
-            Log.d(TAG, "MovieDbAdapterViewHolder!!");
             mMoviePosterImageView = (ImageView) view.findViewById(R.id.iv_movie_poster);
             view.setOnClickListener(this);
         }
@@ -76,7 +77,6 @@ public class MovieDbAdapter extends RecyclerView.Adapter<MovieDbAdapter.MovieDbA
          */
         @Override
         public void onClick(View v) {
-            Log.d(TAG, "MovieDbAdapterViewHolder!! Click");
             int adapterPosition = getAdapterPosition();
             mCursor.moveToPosition(adapterPosition);
             Integer movieId = MovieDetailedInfosProvider.getMovieIdFromMainProjectionCursor(mCursor);
@@ -99,12 +99,20 @@ public class MovieDbAdapter extends RecyclerView.Adapter<MovieDbAdapter.MovieDbA
     public void onBindViewHolder(MovieDbAdapterViewHolder movieDbAdapterViewHolder, int position) {
         Log.d(TAG, "onBindViewHolder - position: " + position);
         mCursor.moveToPosition(position);
+
         String posterPath = MovieDetailedInfosProvider.getPosterPathFromMainProjectionCursor(mCursor);
-        String posterUrl = NetworkUtils.buildImageUrl(posterPath, NetworkUtils.ImageQuality.W342);
 
-        Log.d(TAG, "posterPath: " + posterUrl);
+        if(ImageUtility.hasLocalImageFile(mContext, posterPath)) {
+            Log.d(TAG, "onBindViewHolder - setting saved poster image");
+            Picasso.with(movieDbAdapterViewHolder.mMoviePosterImageView.getContext()).load(ImageUtility.getFileFromPath(mContext, posterPath)).into(movieDbAdapterViewHolder.mMoviePosterImageView);
+        } else {
 
-        Picasso.with(movieDbAdapterViewHolder.mMoviePosterImageView.getContext()).load(posterUrl).into(movieDbAdapterViewHolder.mMoviePosterImageView);
+            String posterUrl = NetworkUtils.buildImageUrl(posterPath, NetworkUtils.ImageQuality.W342);
+
+            Log.d(TAG, "onBindViewHolder - posterPath: " + posterUrl);
+
+            Picasso.with(movieDbAdapterViewHolder.mMoviePosterImageView.getContext()).load(posterUrl).into(movieDbAdapterViewHolder.mMoviePosterImageView);
+        }
     }
 
     @Override
@@ -114,12 +122,20 @@ public class MovieDbAdapter extends RecyclerView.Adapter<MovieDbAdapter.MovieDbA
     }
 
     public int getPosition() {
-        return mCursor.getPosition();
+        if(mCursor != null) {
+            return mCursor.getPosition();
+        } else {
+            return 0;
+        }
+    }
+
+    public void setPosition(int position) {
+        if(mCursor != null) {
+            mCursor.moveToPosition(position);
+        }
     }
 
     public void swapCursor(Cursor newCursor) {
-        Log.d(TAG, "swapCursor!!!");
         mCursor = newCursor;
-        //notifyDataSetChanged();
     }
 }

@@ -8,6 +8,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 
 import com.example.android.popularmovies.data.Video;
+import com.example.android.popularmovies.data.db.reviews.ReviewsColumns;
 import com.example.android.popularmovies.utilities.JsonUtility;
 
 import net.simonvt.schematic.annotation.ContentProvider;
@@ -36,24 +37,29 @@ public final class VideosProvider {
         public static final Uri VIDEOS = Uri.parse("content://" + AUTHORITY + "/videos");
     }
 
-    public static final int INDEX_VIDEO_ID = 0;
-    public static final int INDEX_VIDEO_ISO_639_1 = 1;
-    public static final int INDEX_VIDEO_ISO_3166_1 = 2;
-    public static final int INDEX_VIDEO_KEY = 3;
-    public static final int INDEX_VIDEO_NAME = 4;
-    public static final int INDEX_VIDEO_SITE = 5;
-    public static final int INDEX_VIDEO_SIZE = 6;
-    public static final int INDEX_VIDEO_TYPE = 7;
+    public static final int INDEX_ID = 0;
+    public static final int INDEX_MOVIE_ID = 1;
+    public static final int INDEX_VIDEO_ID = 2;
+    public static final int INDEX_VIDEO_ISO_639_1 = 3;
+    public static final int INDEX_VIDEO_ISO_3166_1 = 4;
+    public static final int INDEX_VIDEO_KEY = 5;
+    public static final int INDEX_VIDEO_NAME = 6;
+    public static final int INDEX_VIDEO_SITE = 7;
+    public static final int INDEX_VIDEO_SIZE = 8;
+    public static final int INDEX_VIDEO_TYPE = 9;
 
     private static final String TAG = VideosProvider.class.getSimpleName();
 
-    public static void write(Context context, com.example.android.popularmovies.data.Videos videos) {
+    public static void write(Context context, Integer movieId, com.example.android.popularmovies.data.Videos videos) {
+
+        Log.d(TAG, "write - movieId \"" + movieId + "\" genres \"" + JsonUtility.toJson(videos) + "\"");
 
         List<ContentValues> contentValuesList = new ArrayList<ContentValues>();
 
         for(Video video : videos.getResults()) {
             ContentValues contentValues = new ContentValues();
-            contentValues.put(VideosColumns._ID, video.getId());
+            contentValues.put(VideosColumns.MOVIE_ID, movieId);
+            contentValues.put(VideosColumns.VIDEO_ID, video.getId());
             contentValues.put(VideosColumns.KEY, video.getKey());
             contentValues.put(VideosColumns.ISO_639_1, video.getIso6391());
             contentValues.put(VideosColumns.ISO_3166_1, video.getIso31661());
@@ -61,52 +67,56 @@ public final class VideosProvider {
             contentValues.put(VideosColumns.SITE, video.getSite());
             contentValues.put(VideosColumns.SIZE, video.getSize());
             contentValues.put(VideosColumns.TYPE, video.getType());
+            contentValuesList.add(contentValues);
         }
 
         context.getContentResolver().bulkInsert(Videos.VIDEOS, contentValuesList.toArray(new ContentValues[contentValuesList.size()]));
     }
 
-    public static void remove(Context context, List<String> videosIds) {
+    public static void remove(Context context, Integer movieId) {
 
-        Log.d(TAG, "remove - videosIds: " + JsonUtility.toJson(videosIds.toArray(new String[videosIds.size()])));
+        Log.d(TAG, "remove - movieId: " + movieId);
 
-        if(videosIds == null || videosIds.size() == 0) {
+        if(movieId == null) {
             return;
         }
 
         context.getContentResolver().delete(
                 Videos.VIDEOS,
-                buildSelection(videosIds),
-                videosIds.toArray(new String[videosIds.size()]));
+                ReviewsColumns.MOVIE_ID + " = ?",
+                new String[] { movieId.toString() });
     }
 
-    public static com.example.android.popularmovies.data.Videos getVideosFromFromIds(Context context, List<String> videosIds) {
+    public static com.example.android.popularmovies.data.Videos getVideosFromFromMovieId(Context context, Integer movieId) {
 
-        Log.d(TAG, "getVideosFromFromIds - videosIds: " + JsonUtility.toJson(videosIds));
+        Log.d(TAG, "getReviewsFromFromMovieId - movieId: " + movieId);
         List<Video> videosList = new ArrayList<>();
 
-        if(videosIds == null || videosIds.size() == 0) {
+        if(movieId == null) {
             return new com.example.android.popularmovies.data.Videos(videosList);
         }
 
         Cursor cursor = context.getContentResolver().query(
                 Videos.VIDEOS,
                 null,
-                buildSelection(videosIds),
-                videosIds.toArray(new String[videosIds.size()]),
+                ReviewsColumns.MOVIE_ID + " = ?",
+                new String[] { movieId.toString() },
                 null);
 
-        if(cursor == null || !cursor.moveToFirst()) {
-            return new com.example.android.popularmovies.data.Videos(videosList);
-        }
+        try {
+            if (cursor == null || !cursor.moveToFirst()) {
+                return new com.example.android.popularmovies.data.Videos(videosList);
+            }
 
-
-        videosList.add(getVideoFromCursor(cursor));
-        while(cursor.moveToNext()) {
             videosList.add(getVideoFromCursor(cursor));
-        }
+            while (cursor.moveToNext()) {
+                videosList.add(getVideoFromCursor(cursor));
+            }
 
-        return new com.example.android.popularmovies.data.Videos(videosList);
+            return new com.example.android.popularmovies.data.Videos(videosList);
+        } finally {
+            cursor.close();
+        }
     }
 
     private static Video getVideoFromCursor(Cursor cursor) {
@@ -120,13 +130,5 @@ public final class VideosProvider {
         String type = cursor.getString(INDEX_VIDEO_TYPE);
 
         return new Video(id, iso6391, iso31661, key, name, site, size, type);
-    }
-
-    private static String buildSelection(List<String> ids) {
-        String selection = VideosColumns._ID + " in (";
-        for(int i = 0; i < ids.size(); i++) {
-            selection += "?, ";
-        }
-        return selection.substring(0, selection.length() - 2) + ")";
     }
 }

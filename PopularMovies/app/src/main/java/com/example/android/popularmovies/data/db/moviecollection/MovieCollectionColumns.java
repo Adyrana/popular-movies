@@ -20,7 +20,7 @@ public interface MovieCollectionColumns {
 
     @DataType(TEXT) @NotNull String NAME = "name";
 
-    @DataType(TEXT) @NotNull String POSTER_PATH = "posterPath";
+    @DataType(TEXT) String POSTER_PATH = "posterPath";
 
-    @DataType(TEXT) @NotNull String BACKDROP_PATH = "backdrop_path";
+    @DataType(TEXT) String BACKDROP_PATH = "backdrop_path";
 }

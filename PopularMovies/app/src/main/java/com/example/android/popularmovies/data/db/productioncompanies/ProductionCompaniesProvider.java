@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.example.android.popularmovies.data.ProductionCompanies;
+import com.example.android.popularmovies.utilities.JsonUtility;
 
 import net.simonvt.schematic.annotation.ContentProvider;
 import net.simonvt.schematic.annotation.ContentUri;
@@ -43,13 +44,16 @@ public final class ProductionCompaniesProvider {
 
     public static void write(Context context, Integer movieId, List<com.example.android.popularmovies.data.ProductionCompanies> productionCompanies) {
 
+        Log.d(TAG, "write - movieId \"" + movieId + "\" genres \"" + JsonUtility.toJson(productionCompanies) + "\"");
+
         List<ContentValues> contentValuesList = new ArrayList<ContentValues>();
 
-        for(com.example.android.popularmovies.data.ProductionCompanies productionCompanie : productionCompanies) {
+        for(com.example.android.popularmovies.data.ProductionCompanies productionCompany : productionCompanies) {
             ContentValues contentValues = new ContentValues();
             contentValues.put(ProductionCompaniesColumns.MOVIE_ID, movieId);
-            contentValues.put(ProductionCompaniesColumns.PRODUCTION_COMPANIES_ID, productionCompanie.getId());
-            contentValues.put(ProductionCompaniesColumns.NAME, productionCompanie.getName());
+            contentValues.put(ProductionCompaniesColumns.PRODUCTION_COMPANIES_ID, productionCompany.getId());
+            contentValues.put(ProductionCompaniesColumns.NAME, productionCompany.getName());
+            contentValuesList.add(contentValues);
         }
 
         context.getContentResolver().bulkInsert(ProductionCompanies.PRODUCTION_COMPANIES, contentValuesList.toArray(new ContentValues[contentValuesList.size()]));
@@ -85,16 +89,20 @@ public final class ProductionCompaniesProvider {
                 new String[] { movieId.toString() },
                 null);
 
-        if(cursor == null || !cursor.moveToFirst()) {
-            return productionCompanies;
-        }
+        try {
+            if (cursor == null || !cursor.moveToFirst()) {
+                return productionCompanies;
+            }
 
-        productionCompanies.add(getProductionCompaniesFromCursor(cursor));
-        while(cursor.moveToNext()) {
             productionCompanies.add(getProductionCompaniesFromCursor(cursor));
-        }
+            while (cursor.moveToNext()) {
+                productionCompanies.add(getProductionCompaniesFromCursor(cursor));
+            }
 
-        return productionCompanies;
+            return productionCompanies;
+        } finally {
+            cursor.close();
+        }
     }
 
     private static com.example.android.popularmovies.data.ProductionCompanies getProductionCompaniesFromCursor(Cursor cursor) {

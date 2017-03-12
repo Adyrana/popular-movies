@@ -10,6 +10,7 @@ import android.os.RemoteException;
 import android.util.Log;
 
 import com.example.android.popularmovies.data.Genre;
+import com.example.android.popularmovies.utilities.JsonUtility;
 
 import net.simonvt.schematic.annotation.ContentProvider;
 import net.simonvt.schematic.annotation.ContentUri;
@@ -45,6 +46,8 @@ public final class GenresProvider {
 
     public static void write(Context context, Integer movieId, List<Genre> genres) {
 
+        Log.d(TAG, "write - movieId \"" + movieId + "\" genres \"" + JsonUtility.toJson(genres) + "\"");
+
         List<ContentValues> contentValuesList = new ArrayList<ContentValues>();
 
         for(com.example.android.popularmovies.data.Genre genre : genres) {
@@ -76,7 +79,7 @@ public final class GenresProvider {
         Log.d(TAG, "getGenresFromMovieId - movieId: " + movieId);
         List<com.example.android.popularmovies.data.Genre> genres = new ArrayList<>();
 
-        if(movieId == null) {
+        if (movieId == null) {
             return genres;
         }
 
@@ -84,19 +87,23 @@ public final class GenresProvider {
                 Genres.GENRES,
                 null,
                 GenresColumns.MOVIE_ID + " = ?",
-                new String[] { movieId.toString() },
+                new String[]{movieId.toString()},
                 null);
 
-        if(cursor == null || !cursor.moveToFirst()) {
-            return genres;
-        }
+        try {
+            if (cursor == null || !cursor.moveToFirst()) {
+                return genres;
+            }
 
-        genres.add(getGenreFromCursor(cursor));
-        while(cursor.moveToNext()) {
             genres.add(getGenreFromCursor(cursor));
-        }
+            while (cursor.moveToNext()) {
+                genres.add(getGenreFromCursor(cursor));
+            }
 
-        return genres;
+            return genres;
+        } finally {
+            cursor.close();
+        }
     }
 
     private static com.example.android.popularmovies.data.Genre getGenreFromCursor(Cursor cursor) {

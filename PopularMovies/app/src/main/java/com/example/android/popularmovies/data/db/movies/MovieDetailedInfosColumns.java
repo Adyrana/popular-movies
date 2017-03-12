@@ -4,6 +4,7 @@ import net.simonvt.schematic.annotation.DataType;
 import net.simonvt.schematic.annotation.NotNull;
 import net.simonvt.schematic.annotation.PrimaryKey;
 
+import static net.simonvt.schematic.annotation.DataType.Type.BLOB;
 import static net.simonvt.schematic.annotation.DataType.Type.INTEGER;
 import static net.simonvt.schematic.annotation.DataType.Type.REAL;
 import static net.simonvt.schematic.annotation.DataType.Type.TEXT;
@@ -62,7 +63,7 @@ public interface MovieDetailedInfosColumns {
 
     @DataType(INTEGER) @NotNull String VOTE_COUNT = "vote_count";
 
-    @DataType(TEXT) @NotNull String VIDEOS = "videos"; // JSON Array of videos IDs
+    @DataType(INTEGER) @NotNull String VIDEOS = "videos"; // JSON Array of videos IDs
 
-    @DataType(TEXT) @NotNull String REVIEWS = "reviews"; // JSON Array of reviews IDs
+    @DataType(INTEGER) @NotNull String REVIEWS = "reviews"; // JSON Array of reviews IDs
 }

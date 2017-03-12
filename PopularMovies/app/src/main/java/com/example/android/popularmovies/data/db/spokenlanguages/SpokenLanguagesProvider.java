@@ -6,6 +6,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
 
+import com.example.android.popularmovies.utilities.JsonUtility;
+
 import net.simonvt.schematic.annotation.ContentProvider;
 import net.simonvt.schematic.annotation.ContentUri;
 import net.simonvt.schematic.annotation.TableEndpoint;
@@ -39,6 +41,8 @@ public final class SpokenLanguagesProvider {
 
     public static void write(Context context, Integer movieId, List<com.example.android.popularmovies.data.SpokenLanguages> spokenLanguages) {
 
+        Log.d(TAG, "write - movieId \"" + movieId + "\" genres \"" + JsonUtility.toJson(spokenLanguages) + "\"");
+
         List<ContentValues> contentValuesList = new ArrayList<ContentValues>();
 
         for(com.example.android.popularmovies.data.SpokenLanguages spokenLanguage : spokenLanguages) {
@@ -46,6 +50,7 @@ public final class SpokenLanguagesProvider {
             contentValues.put(SpokenLanguagesColumns.MOVIE_ID, movieId);
             contentValues.put(SpokenLanguagesColumns.ISO_639_1, spokenLanguage.getIso6391());
             contentValues.put(SpokenLanguagesColumns.NAME, spokenLanguage.getName());
+            contentValuesList.add(contentValues);
         }
 
         context.getContentResolver().bulkInsert(SpokenLanguages.MOVIE_DETAILED_INFOS, contentValuesList.toArray(new ContentValues[contentValuesList.size()]));
@@ -81,16 +86,20 @@ public final class SpokenLanguagesProvider {
                 new String[] { movieId.toString() },
                 null);
 
-        if(cursor == null || !cursor.moveToFirst()) {
-            return spokenLanguages;
-        }
+        try {
+            if (cursor == null || !cursor.moveToFirst()) {
+                return spokenLanguages;
+            }
 
-        spokenLanguages.add(getSpokenLanguagesFromCursor(cursor));
-        while(cursor.moveToNext()) {
             spokenLanguages.add(getSpokenLanguagesFromCursor(cursor));
-        }
+            while (cursor.moveToNext()) {
+                spokenLanguages.add(getSpokenLanguagesFromCursor(cursor));
+            }
 
-        return spokenLanguages;
+            return spokenLanguages;
+        } finally {
+            cursor.close();
+        }
     }
 
     private static com.example.android.popularmovies.data.SpokenLanguages getSpokenLanguagesFromCursor(Cursor cursor) {
