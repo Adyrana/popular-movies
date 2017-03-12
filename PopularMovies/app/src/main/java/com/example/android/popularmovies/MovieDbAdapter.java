@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright (C) 2017 Julia Mattjus
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,7 +62,7 @@ public class MovieDbAdapter extends RecyclerView.Adapter<MovieDbAdapter.MovieDbA
      * Cache of the children views for a movie list item.
      */
     public class MovieDbAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        public final ImageView mMoviePosterImageView;
+        private final ImageView mMoviePosterImageView;
 
         public MovieDbAdapterViewHolder(View view) {
             super(view);

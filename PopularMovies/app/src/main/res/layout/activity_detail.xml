@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-     Copyright (C) 2016 The Android Open Source Project
+     Copyright (C) 2017 Julia Mattjus
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -15,184 +15,180 @@
      limitations under the License.
 -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_width="match_parent" >
+    android:fillViewport="true">
 
-    <ScrollView
+    <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/coordinator_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:fillViewport="true">
+        android:layout_height="wrap_content"
+        android:background="@color/white">
 
-        <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:id="@+id/coordinator_layout"
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/constraint_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/white">
+            android:orientation="vertical">
 
-            <android.support.constraint.ConstraintLayout
-                android:id="@+id/constraint_layout"
-                android:layout_width="match_parent"
+            <ImageView
+                android:id="@+id/iv_backdrop"
+                android:layout_width="0dp"
+                android:layout_height="400dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/moana_poster"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <View
+                android:id="@+id/v_detailed_frame"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginTop="250dp"
+                android:background="@color/white"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/iv_backdrop" />
+
+            <ImageView
+                android:id="@+id/iv_poster"
+                android:layout_width="139dp"
+                android:layout_height="210dp"
+                android:layout_marginLeft="32dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="220dp"
+                app:layout_constraintLeft_toLeftOf="@+id/v_detailed_frame"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/moana_poster" />
+
+            <include
+                android:id="@+id/movie_details"
+                layout="@layout/detailed_info"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:id="@+id/iv_backdrop"
-                    android:layout_width="0dp"
-                    android:layout_height="400dp"
-                    android:scaleType="centerCrop"
-                    android:src="@drawable/moana_poster"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <View
-                    android:id="@+id/v_detailed_frame"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_marginTop="250dp"
-                    android:background="@color/white"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/iv_backdrop" />
-
-                <ImageView
-                    android:id="@+id/iv_poster"
-                    android:layout_width="139dp"
-                    android:layout_height="210dp"
-                    android:layout_marginLeft="32dp"
-                    android:layout_marginStart="32dp"
-                    android:layout_marginTop="220dp"
-                    app:layout_constraintLeft_toLeftOf="@+id/v_detailed_frame"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/moana_poster" />
-
-                <include
-                    android:id="@+id/movie_details"
-                    layout="@layout/detailed_info"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginLeft="32dp"
-                    android:layout_marginRight="16dp"
-                    android:layout_marginStart="32dp"
-                    android:layout_marginTop="32dp"
-                    app:layout_constraintLeft_toRightOf="@+id/iv_poster"
-                    app:layout_constraintRight_toRightOf="@+id/v_detailed_frame"
-                    app:layout_constraintTop_toTopOf="@+id/v_detailed_frame" />
-
-                <TextView
-                    android:id="@+id/tv_synopsis"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="32dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_marginLeft="16dp"
-                    android:layout_marginRight="16dp"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="16dp"
-                    android:textColor="@color/primaryText"
-                    app:layout_constraintBottom_toTopOf="@+id/v_detailed_frame"
-                    app:layout_constraintLeft_toLeftOf="@+id/v_detailed_frame"
-                    app:layout_constraintRight_toRightOf="@+id/v_detailed_frame"
-                    app:layout_constraintTop_toBottomOf="@+id/iv_poster"
-                    app:layout_constraintVertical_bias="0.0"
-                    tools:text="In Ancient Polynesia, when a terrible curse incurred by the Demigod Maui reaches an impetuous Chieftain's daughter's island, she answers the Ocean's call to seek out the Demigod to set things right." />
-
-                <TextView
-                    android:id="@+id/tv_review_header"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:visibility="invisible"
-                    android:layout_marginTop="16dp"
-                    android:text="Reviews"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-                    app:layout_constraintLeft_toLeftOf="@+id/tv_synopsis"
-                    app:layout_constraintTop_toBottomOf="@+id/tv_synopsis"
-                    tools:text="Reviews" />
-
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/recyclerview_reviews"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:visibility="invisible"
-                    android:layout_marginTop="8dp"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintLeft_toLeftOf="@+id/tv_synopsis"
-                    app:layout_constraintRight_toRightOf="@+id/tv_synopsis"
-                    app:layout_constraintTop_toBottomOf="@+id/tv_review_header" />
-
-                <TextView
-                    android:id="@+id/tv_video_header"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:visibility="invisible"
-                    android:text="Trailers"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-                    app:layout_constraintLeft_toLeftOf="@+id/recyclerview_reviews"
-                    app:layout_constraintTop_toBottomOf="@+id/recyclerview_reviews"
-                    tools:text="Trailers" />
-
-                <android.support.v7.widget.RecyclerView
-                    android:id="@+id/recyclerview_videos"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:visibility="invisible"
-                    android:layout_marginTop="8dp"
-                    app:layout_constraintLeft_toLeftOf="@+id/recyclerview_reviews"
-                    app:layout_constraintRight_toRightOf="@+id/recyclerview_reviews"
-                    app:layout_constraintTop_toBottomOf="@+id/tv_video_header" />
-
-            </android.support.constraint.ConstraintLayout>
+                android:layout_marginEnd="16dp"
+                android:layout_marginLeft="32dp"
+                android:layout_marginRight="16dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="32dp"
+                app:layout_constraintLeft_toRightOf="@+id/iv_poster"
+                app:layout_constraintRight_toRightOf="@+id/v_detailed_frame"
+                app:layout_constraintTop_toTopOf="@+id/v_detailed_frame" />
 
             <TextView
-                android:id="@+id/tv_detail_error_message_display"
+                android:id="@+id/tv_synopsis"
                 android:layout_width="0dp"
-                android:layout_height="947dp"
-                android:text="Some Error"
-                android:visibility="invisible"
-                tools:layout_editor_absoluteX="8dp"
-                tools:layout_editor_absoluteY="33dp" />
-
-            <ProgressBar
-                android:id="@+id/pb_detail_loading_indicator"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_gravity="center"
-                android:visibility="invisible"
-                tools:layout_editor_absoluteX="8dp"
-                tools:layout_editor_absoluteY="25dp" />
-
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/floatingActionButton"
-                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:layout_marginEnd="38dp"
+                android:layout_marginBottom="32dp"
+                android:layout_marginEnd="16dp"
                 android:layout_marginLeft="16dp"
-                android:layout_marginRight="38dp"
+                android:layout_marginRight="16dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="16dp"
-                android:src="@drawable/ic_star_off"
-                android:visibility="invisible"
-                app:layout_anchor="@id/v_detailed_frame"
-                app:layout_anchorGravity="top|right|end" />
+                android:textColor="@color/primaryText"
+                app:layout_constraintBottom_toTopOf="@+id/v_detailed_frame"
+                app:layout_constraintLeft_toLeftOf="@+id/v_detailed_frame"
+                app:layout_constraintRight_toRightOf="@+id/v_detailed_frame"
+                app:layout_constraintTop_toBottomOf="@+id/movie_details"
+                app:layout_constraintVertical_bias="0.005"
+                tools:text="In Ancient Polynesia, when a terrible curse incurred by the Demigod Maui reaches an impetuous Chieftain's daughter's island, she answers the Ocean's call to seek out the Demigod to set things right."
+                app:layout_constraintHorizontal_bias="0.0" />
 
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                android:background="#00000000"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
-        </android.support.design.widget.CoordinatorLayout>
-    </ScrollView>
-</LinearLayout>
+            <TextView
+                android:id="@+id/tv_review_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="invisible"
+                android:layout_marginTop="16dp"
+                android:text="@string/reviews"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                app:layout_constraintLeft_toLeftOf="@+id/tv_synopsis"
+                app:layout_constraintTop_toBottomOf="@+id/tv_synopsis"
+                tools:text="Reviews" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recyclerview_reviews"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:visibility="invisible"
+                android:layout_marginTop="8dp"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintLeft_toLeftOf="@+id/tv_synopsis"
+                app:layout_constraintRight_toRightOf="@+id/tv_synopsis"
+                app:layout_constraintTop_toBottomOf="@+id/tv_review_header" />
+
+            <TextView
+                android:id="@+id/tv_video_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="invisible"
+                android:text="@string/trailers"
+                android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                app:layout_constraintLeft_toLeftOf="@+id/recyclerview_reviews"
+                app:layout_constraintTop_toBottomOf="@+id/recyclerview_reviews"
+                tools:text="Trailers" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recyclerview_videos"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:visibility="invisible"
+                android:layout_marginTop="8dp"
+                app:layout_constraintLeft_toLeftOf="@+id/recyclerview_reviews"
+                app:layout_constraintRight_toRightOf="@+id/recyclerview_reviews"
+                app:layout_constraintTop_toBottomOf="@+id/tv_video_header" />
+
+        </android.support.constraint.ConstraintLayout>
+
+        <ProgressBar
+            android:id="@+id/pb_detail_loading_indicator"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            android:visibility="invisible"
+            tools:layout_editor_absoluteX="8dp"
+            tools:layout_editor_absoluteY="25dp" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/floatingActionButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:layout_marginEnd="38dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="38dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:src="@drawable/ic_star_off"
+            android:visibility="invisible"
+            app:layout_anchor="@id/v_detailed_frame"
+            app:layout_anchorGravity="top|right|end" />
+
+        <TextView
+            android:id="@+id/tv_detail_error_message_display"
+            android:layout_width="0dp"
+            android:layout_height="947dp"
+            android:text="@string/error"
+            android:visibility="invisible"
+            tools:layout_editor_absoluteX="8dp"
+            tools:layout_editor_absoluteY="33dp" />
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="#00000000"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    </android.support.design.widget.CoordinatorLayout>
+</ScrollView>

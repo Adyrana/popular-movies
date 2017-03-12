@@ -1,3 +1,19 @@
+/*
+ * Copyright (C) 2017 Julia Mattjus
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.example.android.popularmovies.data.db.videos;
 
 import android.content.ContentValues;
@@ -37,16 +53,16 @@ public final class VideosProvider {
         public static final Uri VIDEOS = Uri.parse("content://" + AUTHORITY + "/videos");
     }
 
-    public static final int INDEX_ID = 0;
-    public static final int INDEX_MOVIE_ID = 1;
-    public static final int INDEX_VIDEO_ID = 2;
-    public static final int INDEX_VIDEO_ISO_639_1 = 3;
-    public static final int INDEX_VIDEO_ISO_3166_1 = 4;
-    public static final int INDEX_VIDEO_KEY = 5;
-    public static final int INDEX_VIDEO_NAME = 6;
-    public static final int INDEX_VIDEO_SITE = 7;
-    public static final int INDEX_VIDEO_SIZE = 8;
-    public static final int INDEX_VIDEO_TYPE = 9;
+    private static final int INDEX_ID = 0;
+    private static final int INDEX_MOVIE_ID = 1;
+    private static final int INDEX_VIDEO_ID = 2;
+    private static final int INDEX_VIDEO_ISO_639_1 = 3;
+    private static final int INDEX_VIDEO_ISO_3166_1 = 4;
+    private static final int INDEX_VIDEO_KEY = 5;
+    private static final int INDEX_VIDEO_NAME = 6;
+    private static final int INDEX_VIDEO_SITE = 7;
+    private static final int INDEX_VIDEO_SIZE = 8;
+    private static final int INDEX_VIDEO_TYPE = 9;
 
     private static final String TAG = VideosProvider.class.getSimpleName();
 
