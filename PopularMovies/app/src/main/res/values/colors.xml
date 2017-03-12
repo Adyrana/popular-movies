@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-     Copyright (C) 2016 The Android Open Source Project
+     Copyright (C) 2017 Julia Mattjus
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -15,11 +15,15 @@
      limitations under the License.
 -->
 <resources>
-    <color name="colorPrimary">#303030</color>
-    <color name="colorPrimaryDark">#000000</color>
-    <color name="colorAccent">#FF4081</color>
-    <color name="detailedMovieHeader">#009688</color>
-    <color name="detailedMovieText">#FFFFFF</color>
-    <color name="darkText">#000000</color>
-    <color name="grayText">#7c7c7c</color>
+    <color name="colorPrimary">#673AB7</color>
+    <color name="colorPrimaryDark">#512DA8</color>
+    <color name="colorPrimaryLight">#D1C4E9</color>
+    <color name="textAndIcons">#FFFFFF</color>
+    <color name="white">#FFFFFF</color>
+    <color name="colorAccent">#FF5722</color>
+    <color name="primaryText">#212121</color>
+    <color name="secondaryText">#757575</color>
+    <color name="divider">#BDBDBD</color>
+    <color name="startHighLight">#FFEE00</color>
+    <color name="recyclerView">#303030</color>
 </resources>

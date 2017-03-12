@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright (C) 2017 Julia Mattjus
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,14 +42,7 @@ public class TheMovieDbAdapter extends RecyclerView.Adapter<TheMovieDbAdapter.Th
 
     private List<Movie> mMovies;
 
-    private final TheMovieDbAdapterOnClickHandler mClickHandler;
-
-    /**
-     * The interface that receives onClick messages.
-     */
-    public interface TheMovieDbAdapterOnClickHandler {
-        void onClick(Movie movieData);
-    }
+    private final IMovieAdapterOnClickHandler mClickHandler;
 
     /**
      * Creates a TheMovieDbAdapter
@@ -57,7 +50,7 @@ public class TheMovieDbAdapter extends RecyclerView.Adapter<TheMovieDbAdapter.Th
      * @param clickHandler The on-click handler for this adapter. This single handler is called
      *                     when an item is clicked.
      */
-    public TheMovieDbAdapter(TheMovieDbAdapterOnClickHandler clickHandler) {
+    public TheMovieDbAdapter(IMovieAdapterOnClickHandler clickHandler) {
         mClickHandler = clickHandler;
     }
 
@@ -65,7 +58,7 @@ public class TheMovieDbAdapter extends RecyclerView.Adapter<TheMovieDbAdapter.Th
      * Cache of the children views for a movie list item.
      */
     public class TheMovieDbAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        public final ImageView mMoviePosterImageView;
+        private final ImageView mMoviePosterImageView;
 
         public TheMovieDbAdapterViewHolder(View view) {
             super(view);
@@ -82,7 +75,7 @@ public class TheMovieDbAdapter extends RecyclerView.Adapter<TheMovieDbAdapter.Th
         public void onClick(View v) {
             int adapterPosition = getAdapterPosition();
             Movie movie = mMovies.get(adapterPosition);
-            mClickHandler.onClick(movie);
+            mClickHandler.onClick(movie.getId());
         }
     }
 
@@ -100,25 +93,10 @@ public class TheMovieDbAdapter extends RecyclerView.Adapter<TheMovieDbAdapter.Th
     @Override
     public void onBindViewHolder(TheMovieDbAdapterViewHolder theMovieDbAdapterViewHolder, int position) {
         Movie movie = mMovies.get(position);
-        String posterPath = NetworkUtils.buildPosterUrl(movie.getPosterPath());
+        String posterPath = NetworkUtils.buildImageUrl(movie.getPosterPath(), NetworkUtils.ImageQuality.W342);
         Log.d(TAG, "movie.getPosterPath(): " + movie.getPosterPath());
         Log.d(TAG, "posterPath: " + posterPath);
 
-        /*
-         * Copyright 2013 Square, Inc.
-         *
-         * Licensed under the Apache License, Version 2.0 (the "License");
-         * you may not use this file except in compliance with the License.
-         * You may obtain a copy of the License at
-         *
-         *    http://www.apache.org/licenses/LICENSE-2.0
-         *
-         * Unless required by applicable law or agreed to in writing, software
-         * distributed under the License is distributed on an "AS IS" BASIS,
-         * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-         * See the License for the specific language governing permissions and
-         * limitations under the License.
-         */
         Picasso.with(theMovieDbAdapterViewHolder.mMoviePosterImageView.getContext()).load(posterPath).into(theMovieDbAdapterViewHolder.mMoviePosterImageView);
     }
 
@@ -128,6 +106,11 @@ public class TheMovieDbAdapter extends RecyclerView.Adapter<TheMovieDbAdapter.Th
         return mMovies.size();
     }
 
+    /**
+     * Method for getting the movies for the adapter
+     *
+     * @return
+     */
     public List<Movie> getMovies() {
         return mMovies;
     }
@@ -139,6 +122,5 @@ public class TheMovieDbAdapter extends RecyclerView.Adapter<TheMovieDbAdapter.Th
      */
     public void setMovies(List<Movie> movies) {
         this.mMovies = movies;
-        notifyDataSetChanged();
     }
 }

@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
      Copyright (C) 2016 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +14,7 @@
      limitations under the License.
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.android.popularmovies">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -22,11 +22,13 @@
 
     <application
         android:allowBackup="true"
+        tools:replace="android:icon"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity"
+        <activity
+            android:name=".MainActivity"
             android:label="Popular Movies">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -34,12 +36,47 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DetailActivity"
+        <activity
+            android:name=".DetailActivity"
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
         </activity>
+
+        <provider
+            android:name=".data.db.genres.generated.GenresProvider"
+            android:authorities="com.example.android.popularmovies.data.db.genres.GenresProvider"
+            android:exported="false" />
+        <provider
+            android:name=".data.db.moviecollection.generated.MovieCollectionProvider"
+            android:authorities="com.example.android.popularmovies.data.db.moviecollection.MovieCollectionProvider"
+            android:exported="false" />
+        <provider
+            android:name=".data.db.movies.generated.MovieDetailedInfosProvider"
+            android:authorities="com.example.android.popularmovies.data.db.movies.MovieDetailedInfosProvider"
+            android:exported="false" />
+        <provider
+            android:name=".data.db.productioncompanies.generated.ProductionCompaniesProvider"
+            android:authorities="com.example.android.popularmovies.data.db.productioncompanies.ProductionCompaniesProvider"
+            android:exported="false" />
+        <provider
+            android:name=".data.db.productioncountries.generated.ProductionCountriesProvider"
+            android:authorities="com.example.android.popularmovies.data.db.productioncountries.ProductionCountriesProvider"
+            android:exported="false" />
+        <provider
+            android:name=".data.db.reviews.generated.ReviewsProvider"
+            android:authorities="com.example.android.popularmovies.data.db.reviews.ReviewsProvider"
+            android:exported="false" />
+        <provider
+            android:name=".data.db.spokenlanguages.generated.SpokenLanguagesProvider"
+            android:authorities="com.example.android.popularmovies.data.db.spokenlanguages.SpokenLanguagesProvider"
+            android:exported="false" />
+        <provider
+            android:name=".data.db.videos.generated.VideosProvider"
+            android:authorities="com.example.android.popularmovies.data.db.videos.VideosProvider"
+            android:exported="false" />
+
     </application>
 
 </manifest>

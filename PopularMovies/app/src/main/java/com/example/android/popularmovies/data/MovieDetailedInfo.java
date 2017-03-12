@@ -1,31 +1,25 @@
 /*
- * MIT License
+ * Copyright (C) 2017 Julia Mattjus
  *
- * Copyright (c) 2009-2016 The Project Lombok Authors
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package com.example.android.popularmovies.data;
 
+import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -34,6 +28,7 @@ import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Data class for detailed movie info.
@@ -48,6 +43,7 @@ import lombok.Data;
  * @author Julia Mattjus
  */
 @AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class MovieDetailedInfo implements Parcelable {
     @SerializedName("adult")
@@ -125,6 +121,11 @@ public class MovieDetailedInfo implements Parcelable {
     @SerializedName("vote_count")
     private Integer voteCount;
 
+    @SerializedName("videos")
+    private Videos videos;
+
+    @SerializedName("reviews")
+    private Reviews reviews;
 
     @Override
     public int describeContents() {
@@ -137,7 +138,7 @@ public class MovieDetailedInfo implements Parcelable {
         dest.writeString(this.backdropPath);
         dest.writeParcelable(this.belongsToCollection, flags);
         dest.writeValue(this.budget);
-        dest.writeList(this.genres);
+        dest.writeTypedList(this.genres);
         dest.writeString(this.homepage);
         dest.writeValue(this.id);
         dest.writeString(this.imdbId);
@@ -146,18 +147,20 @@ public class MovieDetailedInfo implements Parcelable {
         dest.writeString(this.overview);
         dest.writeValue(this.popularity);
         dest.writeString(this.posterPath);
-        dest.writeList(this.productionCompanies);
-        dest.writeList(this.productionCountries);
+        dest.writeTypedList(this.productionCompanies);
+        dest.writeTypedList(this.productionCountries);
         dest.writeString(this.releaseDate);
         dest.writeValue(this.revenue);
         dest.writeValue(this.runtime);
-        dest.writeList(this.spokenLanguages);
+        dest.writeTypedList(this.spokenLanguages);
         dest.writeString(this.status);
         dest.writeString(this.tagline);
         dest.writeString(this.title);
         dest.writeValue(this.video);
         dest.writeValue(this.voteAverage);
         dest.writeValue(this.voteCount);
+        dest.writeParcelable(this.videos, flags);
+        dest.writeParcelable(this.reviews, flags);
     }
 
     protected MovieDetailedInfo(Parcel in) {
@@ -165,8 +168,7 @@ public class MovieDetailedInfo implements Parcelable {
         this.backdropPath = in.readString();
         this.belongsToCollection = in.readParcelable(MovieCollection.class.getClassLoader());
         this.budget = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.genres = new ArrayList<Genre>();
-        in.readList(this.genres, Genre.class.getClassLoader());
+        this.genres = in.createTypedArrayList(Genre.CREATOR);
         this.homepage = in.readString();
         this.id = (Integer) in.readValue(Integer.class.getClassLoader());
         this.imdbId = in.readString();
@@ -175,24 +177,23 @@ public class MovieDetailedInfo implements Parcelable {
         this.overview = in.readString();
         this.popularity = (Double) in.readValue(Double.class.getClassLoader());
         this.posterPath = in.readString();
-        this.productionCompanies = new ArrayList<ProductionCompanies>();
-        in.readList(this.productionCompanies, ProductionCompanies.class.getClassLoader());
-        this.productionCountries = new ArrayList<ProductionCountries>();
-        in.readList(this.productionCountries, ProductionCountries.class.getClassLoader());
+        this.productionCompanies = in.createTypedArrayList(ProductionCompanies.CREATOR);
+        this.productionCountries = in.createTypedArrayList(ProductionCountries.CREATOR);
         this.releaseDate = in.readString();
         this.revenue = (Integer) in.readValue(Integer.class.getClassLoader());
         this.runtime = (Integer) in.readValue(Integer.class.getClassLoader());
-        this.spokenLanguages = new ArrayList<SpokenLanguages>();
-        in.readList(this.spokenLanguages, SpokenLanguages.class.getClassLoader());
+        this.spokenLanguages = in.createTypedArrayList(SpokenLanguages.CREATOR);
         this.status = in.readString();
         this.tagline = in.readString();
         this.title = in.readString();
         this.video = (Boolean) in.readValue(Boolean.class.getClassLoader());
         this.voteAverage = (Double) in.readValue(Double.class.getClassLoader());
         this.voteCount = (Integer) in.readValue(Integer.class.getClassLoader());
+        this.videos = in.readParcelable(Videos.class.getClassLoader());
+        this.reviews = in.readParcelable(Reviews.class.getClassLoader());
     }
 
-    public static final Parcelable.Creator<MovieDetailedInfo> CREATOR = new Parcelable.Creator<MovieDetailedInfo>() {
+    public static final Creator<MovieDetailedInfo> CREATOR = new Creator<MovieDetailedInfo>() {
         @Override
         public MovieDetailedInfo createFromParcel(Parcel source) {
             return new MovieDetailedInfo(source);
