@@ -86,7 +86,6 @@ public final class MovieDetailedInfosProvider {
 
     private static final int INDEX_MAIN_MOVIE_PROJECTION_ID = 0;
     private static final int INDEX_MAIN_MOVIE_PROJECTION_POSTER_PATH = 1;
-    private static final int INDEX_MAIN_MOVIE_PROJECTION_POSTER_BITMAP = 2;
 
     private static final String[] MAIN_MOVIES_PROJECTION = {
             MovieDetailedInfosColumns._ID,
@@ -95,6 +94,12 @@ public final class MovieDetailedInfosProvider {
 
     private static final String TAG = MovieDetailedInfosProvider.class.getSimpleName();
 
+    /**
+     * Method for writing a movie to the database with all of it's child objects into separate tables
+     *
+     * @param context
+     * @param movieDetailedInfo
+     */
     public static void write(Context context, MovieDetailedInfo movieDetailedInfo) {
 
         Log.d(TAG, "write - movieDetailedInfo: " + JsonUtility.toJson(movieDetailedInfo));
@@ -176,6 +181,12 @@ public final class MovieDetailedInfosProvider {
         context.getContentResolver().insert(MovieDetailedInfosProvider.MovieDetailedInfos.MOVIE_DETAILED_INFOS, contentValues);
     }
 
+    /**
+     * Get a cursor with all favourite movies, that is, all of the movies in the database
+     *
+     * @param context
+     * @return
+     */
     public static Cursor getFavouritesCursor(Context context) {
         String sortOrder = MovieDetailedInfosColumns.TITLE + " ASC";
 
@@ -194,14 +205,32 @@ public final class MovieDetailedInfosProvider {
         return cursor;
     }
 
+    /**
+     * Helper method for getting the movie id from a main projection cursor
+     *
+     * @param cursor
+     * @return
+     */
     public static Integer getMovieIdFromMainProjectionCursor(Cursor cursor) {
         return cursor.getInt(INDEX_MAIN_MOVIE_PROJECTION_ID);
     }
 
+    /**
+     * Helper method for getting the poster path from a main projection cursor
+     *
+     * @param cursor
+     * @return
+     */
     public static String getPosterPathFromMainProjectionCursor(Cursor cursor) {
         return cursor.getString(INDEX_MAIN_MOVIE_PROJECTION_POSTER_PATH);
     }
 
+    /**
+     * Method that fetches all favourite movies from the database (that is, all of the movies)
+     *
+     * @param context
+     * @return
+     */
     public static List<Movie> getFavourites(Context context) {
         Cursor cursor = context.getContentResolver().query(
                 MovieDetailedInfosProvider.MovieDetailedInfos.MOVIE_DETAILED_INFOS,
@@ -229,6 +258,13 @@ public final class MovieDetailedInfosProvider {
         }
     }
 
+    /**
+     * Get a movie by it's id
+     *
+     * @param context
+     * @param movieId
+     * @return
+     */
     public static MovieDetailedInfo getFavourite(Context context, Integer movieId) {
 
         Log.d(TAG, "getFavourite - movieId: " + movieId);
@@ -251,6 +287,12 @@ public final class MovieDetailedInfosProvider {
         }
     }
 
+    /**
+     * Remove a movie from the database and all of the child objects corresponding database entries
+     *
+     * @param context
+     * @param movieDetailedInfo
+     */
     public static void removeFavourite(Context context, MovieDetailedInfo movieDetailedInfo) {
         remove(context, movieDetailedInfo.getId());
 
@@ -263,6 +305,13 @@ public final class MovieDetailedInfosProvider {
         ReviewsProvider.remove(context, movieDetailedInfo.getId());
     }
 
+    /**
+     * Method that removes a movie from the detailed infos table
+     *
+     * @param context
+     * @param movieId
+     * @return
+     */
     private static int remove(Context context, Integer movieId) {
         return context.getContentResolver().delete(
                 MovieDetailedInfosProvider.MovieDetailedInfos.MOVIE_DETAILED_INFOS,
@@ -270,6 +319,13 @@ public final class MovieDetailedInfosProvider {
                 new String[] { movieId.toString() });
     }
 
+    /**
+     * Method that gets a movie from a cursor, the smaller type of object representing a movie
+     *
+     * @param context
+     * @param cursor
+     * @return
+     */
     public static Movie getMovieFromCursor(Context context, Cursor cursor) {
 
         Integer id = cursor.getInt(INDEX_MOVIE_INFO_ID);
@@ -298,6 +354,13 @@ public final class MovieDetailedInfosProvider {
         return movie;
     }
 
+    /**
+     * Get a movie object from the database, in this case, the complete version of a object representing an movie
+     *
+     * @param context
+     * @param cursor
+     * @return
+     */
     private static MovieDetailedInfo getDetailedMovieFromCursor(Context context, Cursor cursor) {
         Integer id = cursor.getInt(INDEX_MOVIE_INFO_ID);
         Boolean adult = cursor.getInt(INDEX_MOVIE_INFO_ADULT) == 1;

@@ -15,6 +15,8 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 
 /**
+ * Adapter for the reviews so that they can be shown in a recycler view.
+ *
  * @author Julia Mattjus
  */
 @AllArgsConstructor
@@ -40,10 +42,18 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewView
         return reviews.size();
     }
 
+    /**
+     * View holder class for reviews
+     */
     public static class ReviewViewHolder extends RecyclerView.ViewHolder {
         TextView author;
         ExpandableTextView content;
 
+        /**
+         * Constructor
+         *
+         * @param itemView
+         */
         public ReviewViewHolder(View itemView) {
             super(itemView);
             author = (TextView) itemView.findViewById(R.id.tv_review_author);

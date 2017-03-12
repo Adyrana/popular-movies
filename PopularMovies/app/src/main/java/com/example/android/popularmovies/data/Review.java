@@ -9,6 +9,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
+ * Data class for a review.
+ *
+ * Uses Lombok, there needs to be an lombok.config file in the project root with these options
+ * to make things work properly:
+ * <ul>
+ *     <li>lombok.addGeneratedAnnotation = false</li>
+ *     <li>lombok.anyConstructor.suppressConstructorProperties = true</li>
+ * </ul>
+ *
  * @author Julia Mattjus
  */
 @AllArgsConstructor

@@ -42,6 +42,13 @@ public final class ProductionCompaniesProvider {
 
     private static final String TAG = ProductionCompaniesProvider.class.getSimpleName();
 
+    /**
+     * Method for writing a list of production companies to the database
+     *
+     * @param context
+     * @param movieId
+     * @param productionCompanies
+     */
     public static void write(Context context, Integer movieId, List<com.example.android.popularmovies.data.ProductionCompanies> productionCompanies) {
 
         Log.d(TAG, "write - movieId \"" + movieId + "\" genres \"" + JsonUtility.toJson(productionCompanies) + "\"");
@@ -59,6 +66,12 @@ public final class ProductionCompaniesProvider {
         context.getContentResolver().bulkInsert(ProductionCompanies.PRODUCTION_COMPANIES, contentValuesList.toArray(new ContentValues[contentValuesList.size()]));
     }
 
+    /**
+     * Rmove production company database entries by a movie id
+     *
+     * @param context
+     * @param movieId
+     */
     public static void remove(Context context, Integer movieId) {
 
         Log.d(TAG, "remove - movieId: " + movieId);
@@ -73,6 +86,13 @@ public final class ProductionCompaniesProvider {
                 new String[] { movieId.toString() });
     }
 
+    /**
+     * Mthod for getting production companies for a movie by the movie id
+     *
+     * @param context
+     * @param movieId
+     * @return
+     */
     public static List<com.example.android.popularmovies.data.ProductionCompanies> getProductionCompaniesFromMovieId(Context context, Integer movieId) {
 
         Log.d(TAG, "getProductionCompaniesFromMovieId - movieId: " + movieId);
@@ -105,6 +125,12 @@ public final class ProductionCompaniesProvider {
         }
     }
 
+    /**
+     * Method for getting a production company from a cursor
+     *
+     * @param cursor
+     * @return
+     */
     private static com.example.android.popularmovies.data.ProductionCompanies getProductionCompaniesFromCursor(Cursor cursor) {
         Integer id = cursor.getInt(INDEX_PRODUCTION_COMPANIES_ID);
         String name = cursor.getString(INDEX_NAME);

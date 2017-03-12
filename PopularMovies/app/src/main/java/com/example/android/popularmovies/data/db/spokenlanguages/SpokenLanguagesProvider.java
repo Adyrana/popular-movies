@@ -39,6 +39,13 @@ public final class SpokenLanguagesProvider {
 
     private static final String TAG = SpokenLanguagesProvider.class.getSimpleName();
 
+    /**
+     * Method for writing a list of spoken languages for a movie to the database
+     *
+     * @param context
+     * @param movieId
+     * @param spokenLanguages
+     */
     public static void write(Context context, Integer movieId, List<com.example.android.popularmovies.data.SpokenLanguages> spokenLanguages) {
 
         Log.d(TAG, "write - movieId \"" + movieId + "\" genres \"" + JsonUtility.toJson(spokenLanguages) + "\"");
@@ -56,6 +63,12 @@ public final class SpokenLanguagesProvider {
         context.getContentResolver().bulkInsert(SpokenLanguages.MOVIE_DETAILED_INFOS, contentValuesList.toArray(new ContentValues[contentValuesList.size()]));
     }
 
+    /**
+     * Method for removing spoken languages for a movie by the movie id
+     *
+     * @param context
+     * @param movieId
+     */
     public static void remove(Context context, Integer movieId) {
 
         Log.d(TAG, "remove - movieId: " + movieId);
@@ -70,6 +83,13 @@ public final class SpokenLanguagesProvider {
                 new String[] { movieId.toString() });
     }
 
+    /**
+     * Method for getting spoken languages for a movie by the movie id
+     *
+     * @param context
+     * @param movieId
+     * @return
+     */
     public static List<com.example.android.popularmovies.data.SpokenLanguages> getSpokenLanguagesFromMovieId(Context context, Integer movieId) {
 
         Log.d(TAG, "getSpokenLanguagesFromMovieId - movieId: " + movieId);
@@ -102,6 +122,12 @@ public final class SpokenLanguagesProvider {
         }
     }
 
+    /**
+     * Method for getting spoken languages from a cursor
+     *
+     * @param cursor
+     * @return
+     */
     private static com.example.android.popularmovies.data.SpokenLanguages getSpokenLanguagesFromCursor(Cursor cursor) {
         String iso6391 = cursor.getString(INDEX_ISO_639_1);
         String name = cursor.getString(INDEX_NAME);

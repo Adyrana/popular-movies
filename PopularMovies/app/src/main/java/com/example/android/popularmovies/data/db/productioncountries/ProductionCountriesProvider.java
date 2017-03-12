@@ -40,6 +40,13 @@ public final class ProductionCountriesProvider {
 
     private static final String TAG = ProductionCountriesProvider.class.getSimpleName();
 
+    /**
+     * Method for writing a list of production countries to the database
+     *
+     * @param context
+     * @param movieId
+     * @param productionCountries
+     */
     public static void write(Context context, Integer movieId, List<com.example.android.popularmovies.data.ProductionCountries> productionCountries) {
 
         Log.d(TAG, "write - movieId \"" + movieId + "\" genres \"" + JsonUtility.toJson(productionCountries) + "\"");
@@ -57,6 +64,12 @@ public final class ProductionCountriesProvider {
         context.getContentResolver().bulkInsert(ProductionCountries.PRODUCTION_COUNTRIES, contentValuesList.toArray(new ContentValues[contentValuesList.size()]));
     }
 
+    /**
+     * Method for removing production countries for a movie by the movie id
+     *
+     * @param context
+     * @param movieId
+     */
     public static void remove(Context context, Integer movieId) {
 
         Log.d(TAG, "remove - movieId: " + movieId);
@@ -71,6 +84,13 @@ public final class ProductionCountriesProvider {
                 new String[] { movieId.toString() });
     }
 
+    /**
+     * Method for getting production countries for a movie by the movie id
+     *
+     * @param context
+     * @param movieId
+     * @return
+     */
     public static List<com.example.android.popularmovies.data.ProductionCountries> getProductionCountriesFromMovieId(Context context, Integer movieId) {
 
         Log.d(TAG, "getProductionCountriesFromMovieId - movieId: " + movieId);
@@ -103,6 +123,12 @@ public final class ProductionCountriesProvider {
         }
     }
 
+    /**
+     * Method for getting a production country from a cursor
+     *
+     * @param cursor
+     * @return
+     */
     private static com.example.android.popularmovies.data.ProductionCountries getProductionCountriesFromCursor(Cursor cursor) {
         String iso31661 = cursor.getString(INDEX_ISO_3166_1);
         String name = cursor.getString(INDEX_NAME);

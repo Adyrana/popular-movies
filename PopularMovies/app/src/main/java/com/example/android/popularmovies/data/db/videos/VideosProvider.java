@@ -50,6 +50,13 @@ public final class VideosProvider {
 
     private static final String TAG = VideosProvider.class.getSimpleName();
 
+    /**
+     * Method for writing a set of videos to the database
+     *
+     * @param context
+     * @param movieId
+     * @param videos
+     */
     public static void write(Context context, Integer movieId, com.example.android.popularmovies.data.Videos videos) {
 
         Log.d(TAG, "write - movieId \"" + movieId + "\" genres \"" + JsonUtility.toJson(videos) + "\"");
@@ -73,6 +80,12 @@ public final class VideosProvider {
         context.getContentResolver().bulkInsert(Videos.VIDEOS, contentValuesList.toArray(new ContentValues[contentValuesList.size()]));
     }
 
+    /**
+     * Method for removing videos from the database for a movie by the movie id
+     *
+     * @param context
+     * @param movieId
+     */
     public static void remove(Context context, Integer movieId) {
 
         Log.d(TAG, "remove - movieId: " + movieId);
@@ -87,6 +100,13 @@ public final class VideosProvider {
                 new String[] { movieId.toString() });
     }
 
+    /**
+     * Mmethod for getting a set of videos for a movie by the movie id
+     *
+     * @param context
+     * @param movieId
+     * @return
+     */
     public static com.example.android.popularmovies.data.Videos getVideosFromFromMovieId(Context context, Integer movieId) {
 
         Log.d(TAG, "getReviewsFromFromMovieId - movieId: " + movieId);
@@ -119,6 +139,12 @@ public final class VideosProvider {
         }
     }
 
+    /**
+     * Method for getting a video from a cursor
+     *
+     * @param cursor
+     * @return
+     */
     private static Video getVideoFromCursor(Cursor cursor) {
         String id = cursor.getString(INDEX_VIDEO_ID);
         String iso6391 = cursor.getString(INDEX_VIDEO_ISO_639_1);
