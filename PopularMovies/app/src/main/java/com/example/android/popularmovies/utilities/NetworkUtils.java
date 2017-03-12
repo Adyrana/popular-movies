@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright (C) 2017 Julia Mattjus
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,6 @@ public class NetworkUtils {
     private static final String APPEND_TO_RESPONSE = "append_to_response";
     private static final String VIDEOS = "videos";
     private static final String REVIEWS = "reviews";
-
     private static final String format = "json";
 
     /**

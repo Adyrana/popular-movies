@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-     Copyright (C) 2016 The Android Open Source Project
+     Copyright (C) 2017 Julia Mattjus
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -25,8 +25,5 @@
     <color name="secondaryText">#757575</color>
     <color name="divider">#BDBDBD</color>
     <color name="startHighLight">#FFEE00</color>
-    <!--<color name="detailedMovieHeader"></color>
-    <color name="detailedMovieText"></color>
-    <color name="darkText"></color>
-    <color name="grayText"></color>-->
+    <color name="recyclerView">#303030</color>
 </resources>

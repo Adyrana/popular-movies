@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The Android Open Source Project
+ * Copyright (C) 2017 Julia Mattjus
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -460,7 +460,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
                     Intent sharingIntent = new Intent(Intent.ACTION_SEND);
                     sharingIntent.setType("text/html");
                     sharingIntent.putExtra(Intent.EXTRA_TEXT, "http://www.youtube.com/watch?v=" + video.getKey());
-                    startActivity(Intent.createChooser(sharingIntent, "Share using"));
+                    startActivity(Intent.createChooser(sharingIntent, getResources().getString(R.string.action_share)));
                 }
                 break;
             default:
