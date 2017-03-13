@@ -19,14 +19,11 @@ package com.example.android.popularmovies.data.db.spokenlanguages;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.net.Uri;
 import android.util.Log;
 
+import com.example.android.popularmovies.data.SpokenLanguages;
+import com.example.android.popularmovies.data.db.spokenlanguages.SpokenLanguagesContract.SpokenLanguagesEntry;
 import com.example.android.popularmovies.utilities.JsonUtility;
-
-import net.simonvt.schematic.annotation.ContentProvider;
-import net.simonvt.schematic.annotation.ContentUri;
-import net.simonvt.schematic.annotation.TableEndpoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,26 +31,14 @@ import java.util.List;
 /**
  * @author Julia Mattjus
  */
-@ContentProvider(authority = SpokenLanguagesProvider.AUTHORITY, database = SpokenLanguagesDatabase.class)
-public final class SpokenLanguagesProvider {
-    @TableEndpoint(table = SpokenLanguagesDatabase.SPOKEN_LANGUAGES) public static class SpokenLanguages {
-
-        @ContentUri(
-                path = "spoken_languages",
-                type = "vnd.android.cursor.dir/spoken_languages",
-                defaultSort = SpokenLanguagesColumns._ID
-        )
-        public static final Uri MOVIE_DETAILED_INFOS = Uri.parse("content://" + AUTHORITY + "/spoken_languages");
-    }
-
-    public static final String AUTHORITY = "com.example.android.popularmovies.data.db.spokenlanguages.SpokenLanguagesProvider";
+public class SpokenLanguagesHelper {
 
     private static final int INDEX_ID = 0;
     private static final int INDEX_MOVIE_ID = 1;
     private static final int INDEX_ISO_639_1 = 2;
     private static final int INDEX_NAME = 3;
 
-    private static final String TAG = SpokenLanguagesProvider.class.getSimpleName();
+    private static final String TAG = SpokenLanguagesHelper.class.getSimpleName();
 
     /**
      * Method for writing a list of spoken languages for a movie to the database
@@ -62,7 +47,7 @@ public final class SpokenLanguagesProvider {
      * @param movieId
      * @param spokenLanguages
      */
-    public static void write(Context context, Integer movieId, List<com.example.android.popularmovies.data.SpokenLanguages> spokenLanguages) {
+    public static void write(Context context, Integer movieId, List<SpokenLanguages> spokenLanguages) {
 
         Log.d(TAG, "write - movieId \"" + movieId + "\" genres \"" + JsonUtility.toJson(spokenLanguages) + "\"");
 
@@ -70,13 +55,13 @@ public final class SpokenLanguagesProvider {
 
         for(com.example.android.popularmovies.data.SpokenLanguages spokenLanguage : spokenLanguages) {
             ContentValues contentValues = new ContentValues();
-            contentValues.put(SpokenLanguagesColumns.MOVIE_ID, movieId);
-            contentValues.put(SpokenLanguagesColumns.ISO_639_1, spokenLanguage.getIso6391());
-            contentValues.put(SpokenLanguagesColumns.NAME, spokenLanguage.getName());
+            contentValues.put(SpokenLanguagesEntry.MOVIE_ID, movieId);
+            contentValues.put(SpokenLanguagesEntry.ISO_639_1, spokenLanguage.getIso6391());
+            contentValues.put(SpokenLanguagesEntry.NAME, spokenLanguage.getName());
             contentValuesList.add(contentValues);
         }
 
-        context.getContentResolver().bulkInsert(SpokenLanguages.MOVIE_DETAILED_INFOS, contentValuesList.toArray(new ContentValues[contentValuesList.size()]));
+        context.getContentResolver().bulkInsert(SpokenLanguagesEntry.CONTENT_URI, contentValuesList.toArray(new ContentValues[contentValuesList.size()]));
     }
 
     /**
@@ -94,8 +79,8 @@ public final class SpokenLanguagesProvider {
         }
 
         context.getContentResolver().delete(
-                SpokenLanguages.MOVIE_DETAILED_INFOS,
-                SpokenLanguagesColumns.MOVIE_ID + " = ?",
+                SpokenLanguagesEntry.CONTENT_URI,
+                SpokenLanguagesEntry.MOVIE_ID + " = ?",
                 new String[] { movieId.toString() });
     }
 
@@ -116,9 +101,9 @@ public final class SpokenLanguagesProvider {
         }
 
         Cursor cursor = context.getContentResolver().query(
-                SpokenLanguages.MOVIE_DETAILED_INFOS,
+                SpokenLanguagesEntry.CONTENT_URI,
                 null,
-                SpokenLanguagesColumns.MOVIE_ID + " = ?",
+                SpokenLanguagesEntry.MOVIE_ID + " = ?",
                 new String[] { movieId.toString() },
                 null);
 
@@ -134,7 +119,9 @@ public final class SpokenLanguagesProvider {
 
             return spokenLanguages;
         } finally {
-            cursor.close();
+            if(cursor != null) {
+                cursor.close();
+            }
         }
     }
 

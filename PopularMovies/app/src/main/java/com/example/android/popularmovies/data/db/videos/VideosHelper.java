@@ -14,22 +14,17 @@
  * limitations under the License.
  */
 
+
 package com.example.android.popularmovies.data.db.videos;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.net.Uri;
-import android.provider.MediaStore;
 import android.util.Log;
 
 import com.example.android.popularmovies.data.Video;
-import com.example.android.popularmovies.data.db.reviews.ReviewsColumns;
+import com.example.android.popularmovies.data.db.videos.VideosContract.VideosEntry;
 import com.example.android.popularmovies.utilities.JsonUtility;
-
-import net.simonvt.schematic.annotation.ContentProvider;
-import net.simonvt.schematic.annotation.ContentUri;
-import net.simonvt.schematic.annotation.TableEndpoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,21 +32,7 @@ import java.util.List;
 /**
  * @author Julia Mattjus
  */
-@ContentProvider(authority = VideosProvider.AUTHORITY, database = VideosDatabase.class)
-public final class VideosProvider {
-
-    public static final String AUTHORITY = "com.example.android.popularmovies.data.db.videos.VideosProvider";
-    static final Uri BASE_CONTENT_URI = Uri.parse("content://" + AUTHORITY);
-
-    @TableEndpoint(table = VideosDatabase.VIDEOS) public static class Videos {
-
-        @ContentUri(
-                path = "videos",
-                type = "vnd.android.cursor.dir/videos",
-                defaultSort = VideosColumns._ID
-        )
-        public static final Uri VIDEOS = Uri.parse("content://" + AUTHORITY + "/videos");
-    }
+public class VideosHelper {
 
     private static final int INDEX_ID = 0;
     private static final int INDEX_MOVIE_ID = 1;
@@ -64,7 +45,7 @@ public final class VideosProvider {
     private static final int INDEX_VIDEO_SIZE = 8;
     private static final int INDEX_VIDEO_TYPE = 9;
 
-    private static final String TAG = VideosProvider.class.getSimpleName();
+    private static final String TAG = VideosHelper.class.getSimpleName();
 
     /**
      * Method for writing a set of videos to the database
@@ -81,19 +62,19 @@ public final class VideosProvider {
 
         for(Video video : videos.getResults()) {
             ContentValues contentValues = new ContentValues();
-            contentValues.put(VideosColumns.MOVIE_ID, movieId);
-            contentValues.put(VideosColumns.VIDEO_ID, video.getId());
-            contentValues.put(VideosColumns.KEY, video.getKey());
-            contentValues.put(VideosColumns.ISO_639_1, video.getIso6391());
-            contentValues.put(VideosColumns.ISO_3166_1, video.getIso31661());
-            contentValues.put(VideosColumns.NAME, video.getName());
-            contentValues.put(VideosColumns.SITE, video.getSite());
-            contentValues.put(VideosColumns.SIZE, video.getSize());
-            contentValues.put(VideosColumns.TYPE, video.getType());
+            contentValues.put(VideosEntry.MOVIE_ID, movieId);
+            contentValues.put(VideosEntry.VIDEO_ID, video.getId());
+            contentValues.put(VideosEntry.KEY, video.getKey());
+            contentValues.put(VideosEntry.ISO_639_1, video.getIso6391());
+            contentValues.put(VideosEntry.ISO_3166_1, video.getIso31661());
+            contentValues.put(VideosEntry.NAME, video.getName());
+            contentValues.put(VideosEntry.SITE, video.getSite());
+            contentValues.put(VideosEntry.SIZE, video.getSize());
+            contentValues.put(VideosEntry.TYPE, video.getType());
             contentValuesList.add(contentValues);
         }
 
-        context.getContentResolver().bulkInsert(Videos.VIDEOS, contentValuesList.toArray(new ContentValues[contentValuesList.size()]));
+        context.getContentResolver().bulkInsert(VideosEntry.CONTENT_URI, contentValuesList.toArray(new ContentValues[contentValuesList.size()]));
     }
 
     /**
@@ -111,8 +92,8 @@ public final class VideosProvider {
         }
 
         context.getContentResolver().delete(
-                Videos.VIDEOS,
-                ReviewsColumns.MOVIE_ID + " = ?",
+                VideosEntry.CONTENT_URI,
+                VideosEntry.MOVIE_ID + " = ?",
                 new String[] { movieId.toString() });
     }
 
@@ -133,9 +114,9 @@ public final class VideosProvider {
         }
 
         Cursor cursor = context.getContentResolver().query(
-                Videos.VIDEOS,
+                VideosEntry.CONTENT_URI,
                 null,
-                ReviewsColumns.MOVIE_ID + " = ?",
+                VideosEntry.MOVIE_ID + " = ?",
                 new String[] { movieId.toString() },
                 null);
 
@@ -151,7 +132,9 @@ public final class VideosProvider {
 
             return new com.example.android.popularmovies.data.Videos(videosList);
         } finally {
-            cursor.close();
+            if(cursor != null) {
+                cursor.close();
+            }
         }
     }
 

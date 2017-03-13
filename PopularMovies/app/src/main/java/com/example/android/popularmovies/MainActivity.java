@@ -21,7 +21,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
@@ -40,9 +39,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.android.popularmovies.data.Movie;
-import com.example.android.popularmovies.data.MovieDetailedInfo;
 import com.example.android.popularmovies.data.TheMovieDbResponse;
-import com.example.android.popularmovies.data.db.movies.MovieDetailedInfosProvider;
+import com.example.android.popularmovies.data.db.movies.MovieDetailedInfosHelper;
 import com.example.android.popularmovies.utilities.ApiKeyUtility;
 import com.example.android.popularmovies.utilities.JsonUtility;
 import com.example.android.popularmovies.utilities.NetworkUtils;
@@ -142,14 +140,6 @@ public class MainActivity extends AppCompatActivity implements IMovieAdapterOnCl
         }
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if(mSource != null && mSource == MoviesSource.DATABASE && mMovieDbAdapter != null) {
-            mPosition = mMovieDbAdapter.getPosition();
-            loadMovieData();
-        }
-    }
 
     /**
      * This method will start a new task that fetches movies according to the specified sorting.
@@ -269,7 +259,7 @@ public class MainActivity extends AppCompatActivity implements IMovieAdapterOnCl
 
                     @Override
                     public RecyclerView.Adapter loadInBackground() {
-                        Cursor cursor = MovieDetailedInfosProvider.getFavouritesCursor(context);
+                        Cursor cursor = MovieDetailedInfosHelper.getFavouritesCursor(context);
 
                         mMovieDbAdapter.swapCursor(cursor);
 

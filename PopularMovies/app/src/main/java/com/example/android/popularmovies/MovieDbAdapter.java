@@ -18,7 +18,6 @@ package com.example.android.popularmovies;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -27,7 +26,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.example.android.popularmovies.data.db.movies.MovieDetailedInfosProvider;
+import com.example.android.popularmovies.data.db.movies.MovieDetailedInfosHelper;
 import com.example.android.popularmovies.utilities.ImageUtility;
 import com.example.android.popularmovies.utilities.NetworkUtils;
 import com.squareup.picasso.Picasso;
@@ -79,7 +78,7 @@ public class MovieDbAdapter extends RecyclerView.Adapter<MovieDbAdapter.MovieDbA
         public void onClick(View v) {
             int adapterPosition = getAdapterPosition();
             mCursor.moveToPosition(adapterPosition);
-            Integer movieId = MovieDetailedInfosProvider.getMovieIdFromMainProjectionCursor(mCursor);
+            Integer movieId = MovieDetailedInfosHelper.getMovieIdFromMainProjectionCursor(mCursor);
             mClickHandler.onClick(movieId);
         }
     }
@@ -100,7 +99,7 @@ public class MovieDbAdapter extends RecyclerView.Adapter<MovieDbAdapter.MovieDbA
         Log.d(TAG, "onBindViewHolder - position: " + position);
         mCursor.moveToPosition(position);
 
-        String posterPath = MovieDetailedInfosProvider.getPosterPathFromMainProjectionCursor(mCursor);
+        String posterPath = MovieDetailedInfosHelper.getPosterPathFromMainProjectionCursor(mCursor);
 
         if(ImageUtility.hasLocalImageFile(mContext, posterPath)) {
             Log.d(TAG, "onBindViewHolder - setting saved poster image");

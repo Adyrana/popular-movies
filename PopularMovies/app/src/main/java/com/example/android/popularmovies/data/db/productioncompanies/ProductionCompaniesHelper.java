@@ -18,17 +18,12 @@ package com.example.android.popularmovies.data.db.productioncompanies;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
-import android.net.Uri;
 import android.util.Log;
 
 import com.example.android.popularmovies.data.ProductionCompanies;
+import com.example.android.popularmovies.data.db.productioncompanies.ProductionCompaniesContract.ProductionCompaniesEntry;
 import com.example.android.popularmovies.utilities.JsonUtility;
-
-import net.simonvt.schematic.annotation.ContentProvider;
-import net.simonvt.schematic.annotation.ContentUri;
-import net.simonvt.schematic.annotation.TableEndpoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,27 +31,14 @@ import java.util.List;
 /**
  * @author Julia Mattjus
  */
-@ContentProvider(authority = ProductionCompaniesProvider.AUTHORITY, database = ProductionCompaniesDatabase.class)
-public final class ProductionCompaniesProvider {
-
-    @TableEndpoint(table = ProductionCompaniesDatabase.PRODUCTION_COMPANIES) public static class ProductionCompanies {
-
-        @ContentUri(
-                path = "production_companies",
-                type = "vnd.android.cursor.dir/production_companies",
-                defaultSort = ProductionCompaniesColumns._ID
-        )
-        public static final Uri PRODUCTION_COMPANIES = Uri.parse("content://" + AUTHORITY + "/production_companies");
-    }
-
-    public static final String AUTHORITY = "com.example.android.popularmovies.data.db.productioncompanies.ProductionCompaniesProvider";
+public class ProductionCompaniesHelper {
 
     private static final int INDEX_ID = 0;
     private static final int INDEX_MOVIE_ID = 1;
     private static final int INDEX_PRODUCTION_COMPANIES_ID = 2;
     private static final int INDEX_NAME = 3;
 
-    private static final String TAG = ProductionCompaniesProvider.class.getSimpleName();
+    private static final String TAG = ProductionCompaniesHelper.class.getSimpleName();
 
     /**
      * Method for writing a list of production companies to the database
@@ -65,7 +47,7 @@ public final class ProductionCompaniesProvider {
      * @param movieId
      * @param productionCompanies
      */
-    public static void write(Context context, Integer movieId, List<com.example.android.popularmovies.data.ProductionCompanies> productionCompanies) {
+    public static void write(Context context, Integer movieId, List<ProductionCompanies> productionCompanies) {
 
         Log.d(TAG, "write - movieId \"" + movieId + "\" genres \"" + JsonUtility.toJson(productionCompanies) + "\"");
 
@@ -73,13 +55,13 @@ public final class ProductionCompaniesProvider {
 
         for(com.example.android.popularmovies.data.ProductionCompanies productionCompany : productionCompanies) {
             ContentValues contentValues = new ContentValues();
-            contentValues.put(ProductionCompaniesColumns.MOVIE_ID, movieId);
-            contentValues.put(ProductionCompaniesColumns.PRODUCTION_COMPANIES_ID, productionCompany.getId());
-            contentValues.put(ProductionCompaniesColumns.NAME, productionCompany.getName());
+            contentValues.put(ProductionCompaniesEntry.MOVIE_ID, movieId);
+            contentValues.put(ProductionCompaniesEntry.PRODUCTION_COMPANIES_ID, productionCompany.getId());
+            contentValues.put(ProductionCompaniesEntry.NAME, productionCompany.getName());
             contentValuesList.add(contentValues);
         }
 
-        context.getContentResolver().bulkInsert(ProductionCompanies.PRODUCTION_COMPANIES, contentValuesList.toArray(new ContentValues[contentValuesList.size()]));
+        context.getContentResolver().bulkInsert(ProductionCompaniesEntry.CONTENT_URI, contentValuesList.toArray(new ContentValues[contentValuesList.size()]));
     }
 
     /**
@@ -97,8 +79,8 @@ public final class ProductionCompaniesProvider {
         }
 
         context.getContentResolver().delete(
-                ProductionCompanies.PRODUCTION_COMPANIES,
-                ProductionCompaniesColumns.MOVIE_ID + " = ?",
+                ProductionCompaniesEntry.CONTENT_URI,
+                ProductionCompaniesEntry.MOVIE_ID + " = ?",
                 new String[] { movieId.toString() });
     }
 
@@ -119,9 +101,9 @@ public final class ProductionCompaniesProvider {
         }
 
         Cursor cursor = context.getContentResolver().query(
-                ProductionCompanies.PRODUCTION_COMPANIES,
+                ProductionCompaniesEntry.CONTENT_URI,
                 null,
-                ProductionCompaniesColumns.MOVIE_ID + " = ?",
+                ProductionCompaniesEntry.MOVIE_ID + " = ?",
                 new String[] { movieId.toString() },
                 null);
 
@@ -137,7 +119,9 @@ public final class ProductionCompaniesProvider {
 
             return productionCompanies;
         } finally {
-            cursor.close();
+            if(cursor != null) {
+                cursor.close();
+            }
         }
     }
 

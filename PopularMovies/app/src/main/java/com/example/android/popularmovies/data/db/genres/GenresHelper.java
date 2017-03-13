@@ -16,49 +16,30 @@
 
 package com.example.android.popularmovies.data.db.genres;
 
-import android.content.ContentProviderOperation;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.OperationApplicationException;
 import android.database.Cursor;
-import android.net.Uri;
-import android.os.RemoteException;
 import android.util.Log;
 
 import com.example.android.popularmovies.data.Genre;
 import com.example.android.popularmovies.utilities.JsonUtility;
 
-import net.simonvt.schematic.annotation.ContentProvider;
-import net.simonvt.schematic.annotation.ContentUri;
-import net.simonvt.schematic.annotation.TableEndpoint;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import com.example.android.popularmovies.data.db.genres.GenresContract.GenresEntry;
 
 /**
  * @author Julia Mattjus
  */
-@ContentProvider(authority = GenresProvider.AUTHORITY, database = GenresDatabase.class)
-public final class GenresProvider {
-
-    @TableEndpoint(table = GenresDatabase.GENRES) public static class Genres {
-
-        @ContentUri(
-                path = "genres",
-                type = "vnd.android.cursor.dir/genres",
-                defaultSort = GenresColumns._ID
-        )
-        public static final Uri GENRES = Uri.parse("content://" + AUTHORITY + "/genres");
-    }
-
-    public static final String AUTHORITY = "com.example.android.popularmovies.data.db.genres.GenresProvider";
+public class GenresHelper {
 
     private static final int INDEX_ID = 0;
     private static final int INDEX_MOVIE_ID = 1;
     private static final int INDEX_GENRE_ID = 2;
     private static final int INDEX_NAME = 3;
 
-    private static final String TAG = GenresProvider.class.getSimpleName();
+    private static final String TAG = GenresHelper.class.getSimpleName();
 
     /**
      * Method for writing a a list of genres to the database
@@ -75,12 +56,12 @@ public final class GenresProvider {
 
         for(com.example.android.popularmovies.data.Genre genre : genres) {
             ContentValues contentValues = new ContentValues();
-            contentValues.put(GenresColumns.MOVIE_ID, movieId);
-            contentValues.put(GenresColumns.GENRE_ID, genre.getId());
-            contentValues.put(GenresColumns.NAME, genre.getName());
+            contentValues.put(GenresEntry.MOVIE_ID, movieId);
+            contentValues.put(GenresEntry.GENRE_ID, genre.getId());
+            contentValues.put(GenresEntry.NAME, genre.getName());
         }
 
-        context.getContentResolver().bulkInsert(Genres.GENRES, contentValuesList.toArray(new ContentValues[contentValuesList.size()]));
+        context.getContentResolver().bulkInsert(GenresEntry.CONTENT_URI, contentValuesList.toArray(new ContentValues[contentValuesList.size()]));
     }
 
     /**
@@ -98,8 +79,8 @@ public final class GenresProvider {
         }
 
         context.getContentResolver().delete(
-                Genres.GENRES,
-                GenresColumns.MOVIE_ID + " = ?",
+                GenresEntry.CONTENT_URI,
+                GenresEntry.MOVIE_ID + " = ?",
                 new String[] { movieId.toString() });
     }
 
@@ -120,9 +101,9 @@ public final class GenresProvider {
         }
 
         Cursor cursor = context.getContentResolver().query(
-                Genres.GENRES,
+                GenresEntry.CONTENT_URI,
                 null,
-                GenresColumns.MOVIE_ID + " = ?",
+                GenresEntry.MOVIE_ID + " = ?",
                 new String[]{movieId.toString()},
                 null);
 
@@ -138,7 +119,9 @@ public final class GenresProvider {
 
             return genres;
         } finally {
-            cursor.close();
+            if(cursor != null) {
+                cursor.close();
+            }
         }
     }
 

@@ -19,14 +19,11 @@ package com.example.android.popularmovies.data.db.productioncountries;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.net.Uri;
 import android.util.Log;
 
+import com.example.android.popularmovies.data.ProductionCountries;
+import com.example.android.popularmovies.data.db.productioncountries.ProductionCountriesContract.ProductionCountriesEntry;
 import com.example.android.popularmovies.utilities.JsonUtility;
-
-import net.simonvt.schematic.annotation.ContentProvider;
-import net.simonvt.schematic.annotation.ContentUri;
-import net.simonvt.schematic.annotation.TableEndpoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,27 +31,14 @@ import java.util.List;
 /**
  * @author Julia Mattjus
  */
-@ContentProvider(authority = ProductionCountriesProvider.AUTHORITY, database = ProductionCountriesDatabase.class)
-public final class ProductionCountriesProvider {
-
-    @TableEndpoint(table = ProductionCountriesDatabase.PRODUCTION_COUNTRIES) public static class ProductionCountries {
-
-        @ContentUri(
-                path = "production_countries",
-                type = "vnd.android.cursor.dir/production_countries",
-                defaultSort = ProductionCountriesColumns._ID
-        )
-        public static final Uri PRODUCTION_COUNTRIES = Uri.parse("content://" + AUTHORITY + "/production_countries");
-    }
-
-    public static final String AUTHORITY = "com.example.android.popularmovies.data.db.productioncountries.ProductionCountriesProvider";
+public class ProductionCountriesHelper {
 
     private static final int INDEX_ID = 0;
     private static final int INDEX_MOVIE_ID = 1;
     private static final int INDEX_ISO_3166_1 = 2;
     private static final int INDEX_NAME = 3;
 
-    private static final String TAG = ProductionCountriesProvider.class.getSimpleName();
+    private static final String TAG = ProductionCountriesHelper.class.getSimpleName();
 
     /**
      * Method for writing a list of production countries to the database
@@ -63,7 +47,7 @@ public final class ProductionCountriesProvider {
      * @param movieId
      * @param productionCountries
      */
-    public static void write(Context context, Integer movieId, List<com.example.android.popularmovies.data.ProductionCountries> productionCountries) {
+    public static void write(Context context, Integer movieId, List<ProductionCountries> productionCountries) {
 
         Log.d(TAG, "write - movieId \"" + movieId + "\" genres \"" + JsonUtility.toJson(productionCountries) + "\"");
 
@@ -71,13 +55,13 @@ public final class ProductionCountriesProvider {
 
         for(com.example.android.popularmovies.data.ProductionCountries productionCountry : productionCountries) {
             ContentValues contentValues = new ContentValues();
-            contentValues.put(ProductionCountriesColumns.MOVIE_ID, movieId);
-            contentValues.put(ProductionCountriesColumns.ISO_3166_1, productionCountry.getIso31661());
-            contentValues.put(ProductionCountriesColumns.NAME, productionCountry.getName());
+            contentValues.put(ProductionCountriesEntry.MOVIE_ID, movieId);
+            contentValues.put(ProductionCountriesEntry.ISO_3166_1, productionCountry.getIso31661());
+            contentValues.put(ProductionCountriesEntry.NAME, productionCountry.getName());
             contentValuesList.add(contentValues);
         }
 
-        context.getContentResolver().bulkInsert(ProductionCountries.PRODUCTION_COUNTRIES, contentValuesList.toArray(new ContentValues[contentValuesList.size()]));
+        context.getContentResolver().bulkInsert(ProductionCountriesEntry.CONTENT_URI, contentValuesList.toArray(new ContentValues[contentValuesList.size()]));
     }
 
     /**
@@ -95,8 +79,8 @@ public final class ProductionCountriesProvider {
         }
 
         context.getContentResolver().delete(
-                ProductionCountries.PRODUCTION_COUNTRIES,
-                ProductionCountriesColumns.MOVIE_ID + " = ?",
+                ProductionCountriesEntry.CONTENT_URI,
+                ProductionCountriesEntry.MOVIE_ID + " = ?",
                 new String[] { movieId.toString() });
     }
 
@@ -117,9 +101,9 @@ public final class ProductionCountriesProvider {
         }
 
         Cursor cursor = context.getContentResolver().query(
-                ProductionCountries.PRODUCTION_COUNTRIES,
+                ProductionCountriesEntry.CONTENT_URI,
                 null,
-                ProductionCountriesColumns.MOVIE_ID + " = ?",
+                ProductionCountriesEntry.MOVIE_ID + " = ?",
                 new String[] { movieId.toString() },
                 null);
 
@@ -135,7 +119,9 @@ public final class ProductionCountriesProvider {
 
             return productionCountries;
         } finally {
-            cursor.close();
+            if(cursor != null) {
+                cursor.close();
+            }
         }
     }
 

@@ -19,35 +19,19 @@ package com.example.android.popularmovies.data.db.moviecollection;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.net.Uri;
 import android.util.Log;
 
 import com.example.android.popularmovies.utilities.JsonUtility;
 
-import net.simonvt.schematic.annotation.ContentProvider;
-import net.simonvt.schematic.annotation.ContentUri;
-import net.simonvt.schematic.annotation.TableEndpoint;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import com.example.android.popularmovies.data.db.moviecollection.MovieCollectionContract.MovieCollectionEntry;
 
 /**
  * @author Julia Mattjus
  */
-@ContentProvider(authority = MovieCollectionProvider.AUTHORITY, database = MovieCollectionDatabase.class)
-public final class MovieCollectionProvider {
-
-    @TableEndpoint(table = MovieCollectionDatabase.MOVIE_COLLECTION) public static class MovieCollection {
-
-        @ContentUri(
-                path = "movie_collection",
-                type = "vnd.android.cursor.dir/movie_collection",
-                defaultSort = MovieCollectionColumns._ID
-        )
-        public static final Uri MOVIE_COLLECTION = Uri.parse("content://" + AUTHORITY + "/movie_collection");
-    }
-
-    public static final String AUTHORITY = "com.example.android.popularmovies.data.db.moviecollection.MovieCollectionProvider";
+public class MovieCollectionHelper {
 
     private static final int INDEX_ID = 0;
     private static final int INDEX_MOVIE_ID = 1;
@@ -56,7 +40,7 @@ public final class MovieCollectionProvider {
     private static final int INDEX_POSTER_PATH = 4;
     private static final int INDEX_BACKDROP_PATH = 5;
 
-    private static final String TAG = MovieCollectionProvider.class.getSimpleName();
+    private static final String TAG = MovieCollectionHelper.class.getSimpleName();
 
     /**
      * Method for writing a movie collection to the database
@@ -72,13 +56,13 @@ public final class MovieCollectionProvider {
         List<ContentValues> contentValuesList = new ArrayList<ContentValues>();
 
         ContentValues contentValues = new ContentValues();
-        contentValues.put(MovieCollectionColumns.MOVIE_ID, movieId);
-        contentValues.put(MovieCollectionColumns.MOVIE_COLLECTION_ID, movieCollection.getId());
-        contentValues.put(MovieCollectionColumns.NAME, getStringOrEmpty(movieCollection.getName()));
-        contentValues.put(MovieCollectionColumns.POSTER_PATH, getStringOrEmpty(movieCollection.getPosterPath()));
-        contentValues.put(MovieCollectionColumns.BACKDROP_PATH,getStringOrEmpty( movieCollection.getBackdropPath()));
+        contentValues.put(MovieCollectionEntry.MOVIE_ID, movieId);
+        contentValues.put(MovieCollectionEntry.MOVIE_COLLECTION_ID, movieCollection.getId());
+        contentValues.put(MovieCollectionEntry.NAME, getStringOrEmpty(movieCollection.getName()));
+        contentValues.put(MovieCollectionEntry.POSTER_PATH, getStringOrEmpty(movieCollection.getPosterPath()));
+        contentValues.put(MovieCollectionEntry.BACKDROP_PATH,getStringOrEmpty( movieCollection.getBackdropPath()));
 
-        context.getContentResolver().insert(MovieCollection.MOVIE_COLLECTION, contentValues);
+        context.getContentResolver().insert(MovieCollectionEntry.CONTENT_URI, contentValues);
     }
 
     /**
@@ -100,8 +84,8 @@ public final class MovieCollectionProvider {
         }
 
         context.getContentResolver().delete(
-                MovieCollection.MOVIE_COLLECTION,
-                MovieCollectionColumns.MOVIE_ID + " = ?",
+                MovieCollectionEntry.CONTENT_URI,
+                MovieCollectionEntry.MOVIE_ID + " = ?",
                 new String[] { movieId.toString() });
     }
 
@@ -121,9 +105,9 @@ public final class MovieCollectionProvider {
         }
 
         Cursor cursor = context.getContentResolver().query(
-                MovieCollection.MOVIE_COLLECTION,
+                MovieCollectionEntry.CONTENT_URI,
                 null,
-                MovieCollectionColumns.MOVIE_ID + " = ?",
+                MovieCollectionEntry.MOVIE_ID + " = ?",
                 new String[] { movieId.toString() },
                 null);
 
@@ -134,7 +118,9 @@ public final class MovieCollectionProvider {
 
             return getMovieCollectionFromCursor(cursor);
         } finally {
-            cursor.close();
+            if(cursor != null) {
+                cursor.close();
+            }
         }
     }
 

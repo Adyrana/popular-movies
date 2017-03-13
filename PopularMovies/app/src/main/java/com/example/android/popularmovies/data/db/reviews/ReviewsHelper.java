@@ -19,16 +19,11 @@ package com.example.android.popularmovies.data.db.reviews;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.net.Uri;
 import android.util.Log;
 
 import com.example.android.popularmovies.data.Review;
-import com.example.android.popularmovies.data.db.videos.VideosColumns;
+import com.example.android.popularmovies.data.db.reviews.ReviewsContract.ReviewsEntry;
 import com.example.android.popularmovies.utilities.JsonUtility;
-
-import net.simonvt.schematic.annotation.ContentProvider;
-import net.simonvt.schematic.annotation.ContentUri;
-import net.simonvt.schematic.annotation.TableEndpoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,22 +31,7 @@ import java.util.List;
 /**
  * @author Julia Mattjus
  */
-@ContentProvider(authority = ReviewsProvider.AUTHORITY, database = ReviewsDatabase.class)
-public final class ReviewsProvider {
-
-    public static final String AUTHORITY = "com.example.android.popularmovies.data.db.reviews.ReviewsProvider";
-    static final Uri BASE_CONTENT_URI = Uri.parse("content://" + AUTHORITY);
-
-    @TableEndpoint(table = ReviewsDatabase.REVIEWS)
-    public static class Reviews {
-
-        @ContentUri(
-                path = "reviews",
-                type = "vnd.android.cursor.dir/reviews",
-                defaultSort = ReviewsColumns._ID
-        )
-        public static final Uri REVIEWS = Uri.parse("content://" + AUTHORITY + "/reviews");
-    }
+public class ReviewsHelper {
 
     private static final int INDEX_ID = 0;
     private static final int INDEX_MOVIE_ID = 1;
@@ -64,7 +44,7 @@ public final class ReviewsProvider {
     private static final int INDEX_REVIEW_MEDIA_TYPE = 8;
     private static final int INDEX_REVIEW_URL = 9;
 
-    private static final String TAG = ReviewsProvider.class.getSimpleName();
+    private static final String TAG = ReviewsHelper.class.getSimpleName();
 
     /**
      * Method for writing a set of reviews to the database
@@ -81,19 +61,19 @@ public final class ReviewsProvider {
 
         for (Review review : reviews.getResults()) {
             ContentValues contentValues = new ContentValues();
-            contentValues.put(ReviewsColumns.MOVIE_ID, movieId);
-            contentValues.put(ReviewsColumns.REVIEW_ID, review.getId());
-            contentValues.put(ReviewsColumns.AUTHOR, review.getAuthor());
-            contentValues.put(ReviewsColumns.CONTENT, review.getContent());
-            contentValues.put(ReviewsColumns.ISO_639_1, review.getIso6391());
-            contentValues.put(ReviewsColumns.MEDIA_ID, review.getMediaId());
-            contentValues.put(ReviewsColumns.MEDIA_TITLE, review.getMediaTitle());
-            contentValues.put(ReviewsColumns.MEDIA_TYPE, review.getMediaType());
-            contentValues.put(ReviewsColumns.URL, review.getUrl());
+            contentValues.put(ReviewsEntry.MOVIE_ID, movieId);
+            contentValues.put(ReviewsEntry.REVIEW_ID, review.getId());
+            contentValues.put(ReviewsEntry.AUTHOR, review.getAuthor());
+            contentValues.put(ReviewsEntry.CONTENT, review.getContent());
+            contentValues.put(ReviewsEntry.ISO_639_1, review.getIso6391());
+            contentValues.put(ReviewsEntry.MEDIA_ID, review.getMediaId());
+            contentValues.put(ReviewsEntry.MEDIA_TITLE, review.getMediaTitle());
+            contentValues.put(ReviewsEntry.MEDIA_TYPE, review.getMediaType());
+            contentValues.put(ReviewsEntry.URL, review.getUrl());
             contentValuesList.add(contentValues);
         }
 
-        context.getContentResolver().bulkInsert(Reviews.REVIEWS, contentValuesList.toArray(new ContentValues[contentValuesList.size()]));
+        context.getContentResolver().bulkInsert(ReviewsEntry.CONTENT_URI, contentValuesList.toArray(new ContentValues[contentValuesList.size()]));
     }
 
     /**
@@ -111,8 +91,8 @@ public final class ReviewsProvider {
         }
 
         context.getContentResolver().delete(
-                Reviews.REVIEWS,
-                ReviewsColumns.MOVIE_ID + " = ?",
+                ReviewsEntry.CONTENT_URI,
+                ReviewsEntry.MOVIE_ID + " = ?",
                 new String[] { movieId.toString() });
     }
 
@@ -133,9 +113,9 @@ public final class ReviewsProvider {
         }
 
         Cursor cursor = context.getContentResolver().query(
-                Reviews.REVIEWS,
+                ReviewsEntry.CONTENT_URI,
                 null,
-                ReviewsColumns.MOVIE_ID + " = ?",
+                ReviewsEntry.MOVIE_ID + " = ?",
                 new String[] { movieId.toString() },
                 null);
 
@@ -151,7 +131,9 @@ public final class ReviewsProvider {
 
             return new com.example.android.popularmovies.data.Reviews(1, reviewsList, 1, reviewsList.size());
         } finally {
-            cursor.close();
+            if(cursor != null) {
+                cursor.close();
+            }
         }
     }
 

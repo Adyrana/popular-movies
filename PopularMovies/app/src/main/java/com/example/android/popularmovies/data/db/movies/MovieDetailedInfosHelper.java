@@ -19,11 +19,6 @@ package com.example.android.popularmovies.data.db.movies;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.media.Image;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.support.v4.content.CursorLoader;
 import android.util.Log;
 
 import com.example.android.popularmovies.data.Genre;
@@ -32,45 +27,27 @@ import com.example.android.popularmovies.data.MovieCollection;
 import com.example.android.popularmovies.data.MovieDetailedInfo;
 import com.example.android.popularmovies.data.ProductionCompanies;
 import com.example.android.popularmovies.data.ProductionCountries;
-import com.example.android.popularmovies.data.Review;
 import com.example.android.popularmovies.data.Reviews;
 import com.example.android.popularmovies.data.SpokenLanguages;
-import com.example.android.popularmovies.data.Video;
 import com.example.android.popularmovies.data.Videos;
-import com.example.android.popularmovies.data.db.genres.GenresProvider;
-import com.example.android.popularmovies.data.db.moviecollection.MovieCollectionProvider;
-import com.example.android.popularmovies.data.db.productioncompanies.ProductionCompaniesProvider;
-import com.example.android.popularmovies.data.db.productioncountries.ProductionCountriesProvider;
-import com.example.android.popularmovies.data.db.reviews.ReviewsProvider;
-import com.example.android.popularmovies.data.db.spokenlanguages.SpokenLanguagesProvider;
-import com.example.android.popularmovies.data.db.videos.VideosProvider;
-import com.example.android.popularmovies.utilities.ImageUtility;
+import com.example.android.popularmovies.data.db.genres.GenresHelper;
+import com.example.android.popularmovies.data.db.moviecollection.MovieCollectionHelper;
+import com.example.android.popularmovies.data.db.productioncompanies.ProductionCompaniesHelper;
+import com.example.android.popularmovies.data.db.productioncountries.ProductionCountriesHelper;
+import com.example.android.popularmovies.data.db.reviews.ReviewsHelper;
+import com.example.android.popularmovies.data.db.spokenlanguages.SpokenLanguagesHelper;
+import com.example.android.popularmovies.data.db.videos.VideosHelper;
 import com.example.android.popularmovies.utilities.JsonUtility;
-
-import net.simonvt.schematic.annotation.ContentProvider;
-import net.simonvt.schematic.annotation.ContentUri;
-import net.simonvt.schematic.annotation.TableEndpoint;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.android.popularmovies.data.db.movies.MovieDetailedInfosContract.MovieDetailedInfosEntry;
+
 /**
  * @author Julia Mattjus
  */
-@ContentProvider(authority = MovieDetailedInfosProvider.AUTHORITY, database = MovieDetailedInfosDatabase.class)
-public final class MovieDetailedInfosProvider {
-
-    @TableEndpoint(table = MovieDetailedInfosDatabase.MOVIE_DETAILED_INFOS) public static class MovieDetailedInfos {
-
-        @ContentUri(
-                path = "movie_detailed_infos",
-                type = "vnd.android.cursor.dir/movie_detailed_infos",
-                defaultSort = MovieDetailedInfosColumns._ID
-        )
-        public static final Uri MOVIE_DETAILED_INFOS = Uri.parse("content://" + AUTHORITY + "/movie_detailed_infos");
-    }
-
-    public static final String AUTHORITY = "com.example.android.popularmovies.data.db.movies.MovieDetailedInfosProvider";
+public class MovieDetailedInfosHelper {
 
     private static final int INDEX_MOVIE_INFO_ID = 0;
     private static final int INDEX_MOVIE_INFO_ADULT = 1;
@@ -104,11 +81,11 @@ public final class MovieDetailedInfosProvider {
     private static final int INDEX_MAIN_MOVIE_PROJECTION_POSTER_PATH = 1;
 
     private static final String[] MAIN_MOVIES_PROJECTION = {
-            MovieDetailedInfosColumns._ID,
-            MovieDetailedInfosColumns.POSTER_PATH
+            MovieDetailedInfosEntry._ID,
+            MovieDetailedInfosEntry.POSTER_PATH
     };
 
-    private static final String TAG = MovieDetailedInfosProvider.class.getSimpleName();
+    private static final String TAG = MovieDetailedInfosHelper.class.getSimpleName();
 
     /**
      * Method for writing a movie to the database with all of it's child objects into separate tables
@@ -122,79 +99,79 @@ public final class MovieDetailedInfosProvider {
 
         ContentValues contentValues = new ContentValues();
 
-        contentValues.put(MovieDetailedInfosColumns._ID, movieDetailedInfo.getId());
-        contentValues.put(MovieDetailedInfosColumns.ADULT, movieDetailedInfo.getAdult() ? 1 : 0);
-        contentValues.put(MovieDetailedInfosColumns.BACKDROP_PATH, movieDetailedInfo.getBackdropPath());
-        contentValues.put(MovieDetailedInfosColumns.BUDGET, movieDetailedInfo.getBudget());
-        contentValues.put(MovieDetailedInfosColumns.HOMEPAGE, movieDetailedInfo.getHomepage());
-        contentValues.put(MovieDetailedInfosColumns.IMDB_ID, movieDetailedInfo.getImdbId());
-        contentValues.put(MovieDetailedInfosColumns.ORIGINAL_LANGUAGE, movieDetailedInfo.getOriginalLanguage());
-        contentValues.put(MovieDetailedInfosColumns.ORIGINAL_TITLE, movieDetailedInfo.getOriginalTitle());
-        contentValues.put(MovieDetailedInfosColumns.OVERVIEW, movieDetailedInfo.getOverview());
-        contentValues.put(MovieDetailedInfosColumns.POPULARITY, movieDetailedInfo.getPopularity());
-        contentValues.put(MovieDetailedInfosColumns.POSTER_PATH, movieDetailedInfo.getPosterPath());
-        contentValues.put(MovieDetailedInfosColumns.HOMEPAGE, movieDetailedInfo.getHomepage());
-        contentValues.put(MovieDetailedInfosColumns.IMDB_ID, movieDetailedInfo.getImdbId());
-        contentValues.put(MovieDetailedInfosColumns.RELEASE_DATE, movieDetailedInfo.getReleaseDate());
-        contentValues.put(MovieDetailedInfosColumns.REVENUE, movieDetailedInfo.getRevenue());
-        contentValues.put(MovieDetailedInfosColumns.RUNTIME, movieDetailedInfo.getRuntime());
-        contentValues.put(MovieDetailedInfosColumns.STATUS, movieDetailedInfo.getStatus());
-        contentValues.put(MovieDetailedInfosColumns.TAGLINE, movieDetailedInfo.getTagline());
-        contentValues.put(MovieDetailedInfosColumns.TITLE, movieDetailedInfo.getTitle());
-        contentValues.put(MovieDetailedInfosColumns.VIDEO, movieDetailedInfo.getVideo() ? 1 : 0);
-        contentValues.put(MovieDetailedInfosColumns.VOTE_AVERAGE, movieDetailedInfo.getVoteAverage());
-        contentValues.put(MovieDetailedInfosColumns.VOTE_COUNT, movieDetailedInfo.getVoteCount());
+        contentValues.put(MovieDetailedInfosEntry._ID, movieDetailedInfo.getId());
+        contentValues.put(MovieDetailedInfosEntry.ADULT, movieDetailedInfo.getAdult() ? 1 : 0);
+        contentValues.put(MovieDetailedInfosEntry.BACKDROP_PATH, movieDetailedInfo.getBackdropPath());
+        contentValues.put(MovieDetailedInfosEntry.BUDGET, movieDetailedInfo.getBudget());
+        contentValues.put(MovieDetailedInfosEntry.HOMEPAGE, movieDetailedInfo.getHomepage());
+        contentValues.put(MovieDetailedInfosEntry.IMDB_ID, movieDetailedInfo.getImdbId());
+        contentValues.put(MovieDetailedInfosEntry.ORIGINAL_LANGUAGE, movieDetailedInfo.getOriginalLanguage());
+        contentValues.put(MovieDetailedInfosEntry.ORIGINAL_TITLE, movieDetailedInfo.getOriginalTitle());
+        contentValues.put(MovieDetailedInfosEntry.OVERVIEW, movieDetailedInfo.getOverview());
+        contentValues.put(MovieDetailedInfosEntry.POPULARITY, movieDetailedInfo.getPopularity());
+        contentValues.put(MovieDetailedInfosEntry.POSTER_PATH, movieDetailedInfo.getPosterPath());
+        contentValues.put(MovieDetailedInfosEntry.HOMEPAGE, movieDetailedInfo.getHomepage());
+        contentValues.put(MovieDetailedInfosEntry.IMDB_ID, movieDetailedInfo.getImdbId());
+        contentValues.put(MovieDetailedInfosEntry.RELEASE_DATE, movieDetailedInfo.getReleaseDate());
+        contentValues.put(MovieDetailedInfosEntry.REVENUE, movieDetailedInfo.getRevenue());
+        contentValues.put(MovieDetailedInfosEntry.RUNTIME, movieDetailedInfo.getRuntime());
+        contentValues.put(MovieDetailedInfosEntry.STATUS, movieDetailedInfo.getStatus());
+        contentValues.put(MovieDetailedInfosEntry.TAGLINE, movieDetailedInfo.getTagline());
+        contentValues.put(MovieDetailedInfosEntry.TITLE, movieDetailedInfo.getTitle());
+        contentValues.put(MovieDetailedInfosEntry.VIDEO, movieDetailedInfo.getVideo() ? 1 : 0);
+        contentValues.put(MovieDetailedInfosEntry.VOTE_AVERAGE, movieDetailedInfo.getVoteAverage());
+        contentValues.put(MovieDetailedInfosEntry.VOTE_COUNT, movieDetailedInfo.getVoteCount());
 
         if(movieDetailedInfo.getGenres() != null) {
-            GenresProvider.write(context, movieDetailedInfo.getId(), movieDetailedInfo.getGenres());
-            contentValues.put(MovieDetailedInfosColumns.GENRES, movieDetailedInfo.getId());
+            GenresHelper.write(context, movieDetailedInfo.getId(), movieDetailedInfo.getGenres());
+            contentValues.put(MovieDetailedInfosEntry.GENRES, movieDetailedInfo.getId());
         } else {
-            contentValues.put(MovieDetailedInfosColumns.GENRES, -1);
+            contentValues.put(MovieDetailedInfosEntry.GENRES, -1);
         }
 
         if(movieDetailedInfo.getBelongsToCollection() != null) {
-            MovieCollectionProvider.write(context, movieDetailedInfo.getId(), movieDetailedInfo.getBelongsToCollection());
-            contentValues.put(MovieDetailedInfosColumns.BELONGS_TO_COLLECTION, movieDetailedInfo.getId());
+            MovieCollectionHelper.write(context, movieDetailedInfo.getId(), movieDetailedInfo.getBelongsToCollection());
+            contentValues.put(MovieDetailedInfosEntry.BELONGS_TO_COLLECTION, movieDetailedInfo.getId());
         } else {
-            contentValues.put(MovieDetailedInfosColumns.BELONGS_TO_COLLECTION, -1);
+            contentValues.put(MovieDetailedInfosEntry.BELONGS_TO_COLLECTION, -1);
         }
 
         if(movieDetailedInfo.getProductionCompanies() != null) {
-            ProductionCompaniesProvider.write(context, movieDetailedInfo.getId(), movieDetailedInfo.getProductionCompanies());
-            contentValues.put(MovieDetailedInfosColumns.PRODUCTION_COMPANIES, movieDetailedInfo.getId());
+            ProductionCompaniesHelper.write(context, movieDetailedInfo.getId(), movieDetailedInfo.getProductionCompanies());
+            contentValues.put(MovieDetailedInfosEntry.PRODUCTION_COMPANIES, movieDetailedInfo.getId());
         } else {
-            contentValues.put(MovieDetailedInfosColumns.PRODUCTION_COMPANIES, -1);
+            contentValues.put(MovieDetailedInfosEntry.PRODUCTION_COMPANIES, -1);
         }
 
         if(movieDetailedInfo.getProductionCountries() != null) {
-            ProductionCountriesProvider.write(context, movieDetailedInfo.getId(), movieDetailedInfo.getProductionCountries());
-            contentValues.put(MovieDetailedInfosColumns.PRODUCTION_COUNTRIES, movieDetailedInfo.getId());
+            ProductionCountriesHelper.write(context, movieDetailedInfo.getId(), movieDetailedInfo.getProductionCountries());
+            contentValues.put(MovieDetailedInfosEntry.PRODUCTION_COUNTRIES, movieDetailedInfo.getId());
         } else {
-            contentValues.put(MovieDetailedInfosColumns.PRODUCTION_COUNTRIES, -1);
+            contentValues.put(MovieDetailedInfosEntry.PRODUCTION_COUNTRIES, -1);
         }
 
         if(movieDetailedInfo.getSpokenLanguages() != null) {
-            SpokenLanguagesProvider.write(context, movieDetailedInfo.getId(), movieDetailedInfo.getSpokenLanguages());
-            contentValues.put(MovieDetailedInfosColumns.SPOKEN_LANGUAGES, movieDetailedInfo.getId());
+            SpokenLanguagesHelper.write(context, movieDetailedInfo.getId(), movieDetailedInfo.getSpokenLanguages());
+            contentValues.put(MovieDetailedInfosEntry.SPOKEN_LANGUAGES, movieDetailedInfo.getId());
         } else {
-            contentValues.put(MovieDetailedInfosColumns.SPOKEN_LANGUAGES, -1);
+            contentValues.put(MovieDetailedInfosEntry.SPOKEN_LANGUAGES, -1);
         }
 
         if(movieDetailedInfo.getReviews().getResults() != null && movieDetailedInfo.getReviews().getResults().size() > 0) {
-            ReviewsProvider.write(context, movieDetailedInfo.getId(), movieDetailedInfo.getReviews());
-            contentValues.put(MovieDetailedInfosColumns.REVIEWS, movieDetailedInfo.getId());
+            ReviewsHelper.write(context, movieDetailedInfo.getId(), movieDetailedInfo.getReviews());
+            contentValues.put(MovieDetailedInfosEntry.REVIEWS, movieDetailedInfo.getId());
         } else {
-            contentValues.put(MovieDetailedInfosColumns.REVIEWS, -1);
+            contentValues.put(MovieDetailedInfosEntry.REVIEWS, -1);
         }
 
         if(movieDetailedInfo.getVideos().getResults() != null && movieDetailedInfo.getVideos().getResults().size() > 0) {
-            VideosProvider.write(context, movieDetailedInfo.getId(), movieDetailedInfo.getVideos());
-            contentValues.put(MovieDetailedInfosColumns.VIDEOS, movieDetailedInfo.getId());
+            VideosHelper.write(context, movieDetailedInfo.getId(), movieDetailedInfo.getVideos());
+            contentValues.put(MovieDetailedInfosEntry.VIDEOS, movieDetailedInfo.getId());
         } else {
-            contentValues.put(MovieDetailedInfosColumns.VIDEOS, -1);
+            contentValues.put(MovieDetailedInfosEntry.VIDEOS, -1);
         }
 
-        context.getContentResolver().insert(MovieDetailedInfosProvider.MovieDetailedInfos.MOVIE_DETAILED_INFOS, contentValues);
+        context.getContentResolver().insert(MovieDetailedInfosEntry.CONTENT_URI, contentValues);
     }
 
     /**
@@ -204,17 +181,16 @@ public final class MovieDetailedInfosProvider {
      * @return
      */
     public static Cursor getFavouritesCursor(Context context) {
-        String sortOrder = MovieDetailedInfosColumns.TITLE + " ASC";
+        String sortOrder = MovieDetailedInfosEntry.TITLE + " ASC";
 
         Cursor cursor = context.getContentResolver().query(
-                MovieDetailedInfosProvider.MovieDetailedInfos.MOVIE_DETAILED_INFOS,
+                MovieDetailedInfosEntry.CONTENT_URI,
                 MAIN_MOVIES_PROJECTION,
                 null,
                 null,
                 sortOrder);
 
         if(cursor == null) {
-            cursor.close();
             return null;
         }
 
@@ -249,7 +225,7 @@ public final class MovieDetailedInfosProvider {
      */
     public static List<Movie> getFavourites(Context context) {
         Cursor cursor = context.getContentResolver().query(
-                MovieDetailedInfosProvider.MovieDetailedInfos.MOVIE_DETAILED_INFOS,
+                MovieDetailedInfosEntry.CONTENT_URI,
                 null,
                 null,
                 null,
@@ -270,7 +246,9 @@ public final class MovieDetailedInfosProvider {
 
             return favouriteMovies;
         } finally {
-            cursor.close();
+            if(cursor != null) {
+                cursor.close();
+            }
         }
     }
 
@@ -286,9 +264,9 @@ public final class MovieDetailedInfosProvider {
         Log.d(TAG, "getFavourite - movieId: " + movieId);
 
         Cursor cursor = context.getContentResolver().query(
-                MovieDetailedInfosProvider.MovieDetailedInfos.MOVIE_DETAILED_INFOS,
+                MovieDetailedInfosEntry.CONTENT_URI,
                 null,
-                MovieDetailedInfosColumns._ID + " = ?",
+                MovieDetailedInfosEntry._ID + " = ?",
                 new String[] { movieId.toString() },
                 null);
 
@@ -299,7 +277,9 @@ public final class MovieDetailedInfosProvider {
 
             return getDetailedMovieFromCursor(context, cursor);
         } finally {
-            cursor.close();
+            if(cursor != null) {
+                cursor.close();
+            }
         }
     }
 
@@ -312,13 +292,13 @@ public final class MovieDetailedInfosProvider {
     public static void removeFavourite(Context context, MovieDetailedInfo movieDetailedInfo) {
         remove(context, movieDetailedInfo.getId());
 
-        GenresProvider.remove(context, movieDetailedInfo.getId());
-        MovieCollectionProvider.remove(context, movieDetailedInfo.getId());
-        ProductionCompaniesProvider.remove(context, movieDetailedInfo.getId());
-        ProductionCountriesProvider.remove(context, movieDetailedInfo.getId());
-        SpokenLanguagesProvider.remove(context, movieDetailedInfo.getId());
-        VideosProvider.remove(context, movieDetailedInfo.getId());
-        ReviewsProvider.remove(context, movieDetailedInfo.getId());
+        GenresHelper.remove(context, movieDetailedInfo.getId());
+        MovieCollectionHelper.remove(context, movieDetailedInfo.getId());
+        ProductionCompaniesHelper.remove(context, movieDetailedInfo.getId());
+        ProductionCountriesHelper.remove(context, movieDetailedInfo.getId());
+        SpokenLanguagesHelper.remove(context, movieDetailedInfo.getId());
+        VideosHelper.remove(context, movieDetailedInfo.getId());
+        ReviewsHelper.remove(context, movieDetailedInfo.getId());
     }
 
     /**
@@ -330,8 +310,8 @@ public final class MovieDetailedInfosProvider {
      */
     private static int remove(Context context, Integer movieId) {
         return context.getContentResolver().delete(
-                MovieDetailedInfosProvider.MovieDetailedInfos.MOVIE_DETAILED_INFOS,
-                MovieDetailedInfosColumns._ID + " = ?",
+                MovieDetailedInfosEntry.CONTENT_URI,
+                MovieDetailedInfosEntry._ID + " = ?",
                 new String[] { movieId.toString() });
     }
 
@@ -358,7 +338,7 @@ public final class MovieDetailedInfosProvider {
         Double voteAverage = cursor.getDouble(INDEX_MOVIE_INFO_VOTE_AVERAGE);
         Integer voteCount = cursor.getInt(INDEX_MOVIE_INFO_VOTE_COUNT);
 
-        List<Genre> genres = GenresProvider.getGenresFromMovieId(context, id);
+        List<Genre> genres = GenresHelper.getGenresFromMovieId(context, id);
         Integer[] genreIds = new Integer[genres.size()];
         for(int i = 0; i < genres.size(); i++) {
             genreIds[i] = genres.get(i).getId();
@@ -401,29 +381,29 @@ public final class MovieDetailedInfosProvider {
 
         MovieDetailedInfo movieDetailedInfo = new MovieDetailedInfo();
 
-        Reviews reviews = ReviewsProvider.getReviewsFromFromMovieId(context, id);;
+        Reviews reviews = ReviewsHelper.getReviewsFromFromMovieId(context, id);;
         movieDetailedInfo.setReviews(reviews);
-        Videos videos = VideosProvider.getVideosFromFromMovieId(context, id);
+        Videos videos = VideosHelper.getVideosFromFromMovieId(context, id);
         movieDetailedInfo.setVideos(videos);
 
         if(cursor.getInt(INDEX_MOVIE_INFO_GENRES) != -1) {
-            List<Genre> genres = GenresProvider.getGenresFromMovieId(context, id);
+            List<Genre> genres = GenresHelper.getGenresFromMovieId(context, id);
             movieDetailedInfo.setGenres(genres);
         }
         if(cursor.getInt(INDEX_MOVIE_INFO_BELONGS_TO_COLLECTION) != -1) {
-            MovieCollection movieCollection = MovieCollectionProvider.getMovieCollectionFromMovieId(context, id);
+            MovieCollection movieCollection = MovieCollectionHelper.getMovieCollectionFromMovieId(context, id);
             movieDetailedInfo.setBelongsToCollection(movieCollection);
         }
         if(cursor.getInt(INDEX_MOVIE_INFO_PRODUCTION_COMPANIES) != -1) {
-            List<ProductionCompanies> productionCompanies = ProductionCompaniesProvider.getProductionCompaniesFromMovieId(context, id);
+            List<ProductionCompanies> productionCompanies = ProductionCompaniesHelper.getProductionCompaniesFromMovieId(context, id);
             movieDetailedInfo.setProductionCompanies(productionCompanies);
         }
         if(cursor.getInt(INDEX_MOVIE_INFO_PRODUCTION_COUNTRIES) != -1) {
-            List<ProductionCountries> productionCountries = ProductionCountriesProvider.getProductionCountriesFromMovieId(context, id);
+            List<ProductionCountries> productionCountries = ProductionCountriesHelper.getProductionCountriesFromMovieId(context, id);
             movieDetailedInfo.setProductionCountries(productionCountries);
         }
         if(cursor.getInt(INDEX_MOVIE_INFO_SPOKEN_LANGUAGES) != -1) {
-            List<SpokenLanguages> spokenLanguages = SpokenLanguagesProvider.getSpokenLanguagesFromMovieId(context, id);
+            List<SpokenLanguages> spokenLanguages = SpokenLanguagesHelper.getSpokenLanguagesFromMovieId(context, id);
             movieDetailedInfo.setSpokenLanguages(spokenLanguages);
         }
 

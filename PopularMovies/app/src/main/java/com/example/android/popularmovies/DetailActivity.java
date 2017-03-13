@@ -18,15 +18,12 @@ package com.example.android.popularmovies;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.LoaderManager;
@@ -42,23 +39,18 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.example.android.popularmovies.data.MovieDetailedInfo;
 import com.example.android.popularmovies.data.Video;
-import com.example.android.popularmovies.data.db.movies.MovieDetailedInfosProvider;
+import com.example.android.popularmovies.data.db.movies.MovieDetailedInfosHelper;
 import com.example.android.popularmovies.utilities.ApiKeyUtility;
 import com.example.android.popularmovies.utilities.ImageUtility;
 import com.example.android.popularmovies.utilities.JsonUtility;
 import com.example.android.popularmovies.utilities.NetworkUtils;
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -83,7 +75,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         @Override
         protected Object doInBackground(Object[] params) {
             if(movie != null) {
-                MovieDetailedInfosProvider.write(context, movie);
+                MovieDetailedInfosHelper.write(context, movie);
             }
             return null;
         }
@@ -136,13 +128,13 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
             public void onClick(View v) {
                 if(mIsFavourite) {
                     setFloatingActionButton(false);
-                    MovieDetailedInfosProvider.removeFavourite(v.getContext(), mMovie);
+                    MovieDetailedInfosHelper.removeFavourite(v.getContext(), mMovie);
                     ImageUtility.removeImage(v.getContext(), mMovie.getPosterPath());
                     ImageUtility.removeImage(v.getContext(), mMovie.getBackdropPath());
                 } else {
                     setFloatingActionButton(true);
                     if(mMovie != null) {
-                        MovieDetailedInfosProvider.write(v.getContext(), mMovie);
+                        MovieDetailedInfosHelper.write(v.getContext(), mMovie);
                         ImageUtility.saveImage(v.getContext(), ((BitmapDrawable) mMoviePosterImageView.getDrawable()).getBitmap(), mMovie.getPosterPath());
                         ImageUtility.saveImage(v.getContext(), ((BitmapDrawable) mMovieBackdropImageView.getDrawable()).getBitmap(), mMovie.getBackdropPath());
                     }
@@ -214,7 +206,7 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
                     @Override
                     public MovieDetailedInfo loadInBackground() {
-                        return MovieDetailedInfosProvider.getFavourite(context, mMovieId);
+                        return MovieDetailedInfosHelper.getFavourite(context, mMovieId);
                     }
 
                     public void deliverResult(MovieDetailedInfo data) {
@@ -452,7 +444,12 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         switch(clickType) {
             case PLAY:
                 if(video.getKey() != null && !video.getKey().isEmpty()) {
-                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v=" + video.getKey())));
+                    //startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v=" + video.getKey())));
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v=" + video.getKey()));
+
+                    if(intent.resolveActivity(getPackageManager()) != null) {
+                        startActivity(intent);
+                    }
                 }
                 break;
             case SHARE:
@@ -460,7 +457,10 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
                     Intent sharingIntent = new Intent(Intent.ACTION_SEND);
                     sharingIntent.setType("text/html");
                     sharingIntent.putExtra(Intent.EXTRA_TEXT, "http://www.youtube.com/watch?v=" + video.getKey());
-                    startActivity(Intent.createChooser(sharingIntent, getResources().getString(R.string.action_share)));
+
+                    if(sharingIntent.resolveActivity(getPackageManager()) != null) {
+                        startActivity(Intent.createChooser(sharingIntent, getResources().getString(R.string.action_share)));
+                    }
                 }
                 break;
             default:
